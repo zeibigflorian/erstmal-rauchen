@@ -39,8 +39,7 @@
             image-rendering: pixelated;
             width: 100%;
             max-width: 560px;
-            background: #23232f;
-            border: 4px solid #f2efe6
+            background: #1b1b24
         }
 
         #time {
@@ -158,12 +157,15 @@
 
 <body>
     <main>
-        <h1>🚬 FAKD · RAUCHPOOL</h1>
-        <small>Mind. 3 Leute im Pool → 10 Min Countdown. Je mehr, desto schneller.</small>
+        <h1>FAKD · RAUCHPOOL</h1>
+        <small>Mind. 3 Leute im Pool → 6 Min Countdown. Je mehr, desto schneller.</small>
         <p id="status"></p>
-        <canvas id="cv" width="112" height="24"></canvas>
-        <div id="time">10:00</div>
-        <div id="clock"></div>
+        <canvas id="cv" width="140" height="64"></canvas>
+        <div id="time">06:00</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+            <div id="clock"></div>
+            <button class="alt" id="mutebtn" onclick="toggleMute()" style="font-size:9px;padding:3px 7px;border-width:2px">MUTE</button>
+        </div>
         <div id="go" hidden>JETZT GEMEINSAM LOSGEHEN!</div>
         <div class="row" id="joinrow"><input id="name" maxlength="20" placeholder="Dein Name"><button
                 onclick="join()">Pool
@@ -172,17 +174,31 @@
                 onclick="reset()" id="resetb">Neue Runde</button></div>
         <p>Im Pool: <b id="cnt">0</b> · Tempo: <b id="spd">–</b></p>
         <div id="members"></div>
+        <canvas id="cv2" width="140" height="1" style="display:block;margin:8px auto;image-rendering:pixelated;width:100%;max-width:560px;background:#1b1b24"></canvas>
         <p><small id="mode"></small></p>
     </main>
+    <footer style="text-align:center;padding:16px 0 24px;opacity:.5;font-family:'Press Start 2P',monospace;font-size:9px;">
+        Rauchen ist tödlich.
+    </footer>
     <script>
         // ===== EINSTELLUNG: Firebase Realtime Database URL hier eintragen (siehe Anleitung) =====
         const DB_URL = 'https://gemeinsam-rauchen-default-rtdb.europe-west1.firebasedatabase.app/'; // z. B. 'https://fakd-rauch-default-rtdb.europe-west1.firebasedatabase.app'
         // ======================================================================================
-        const TOTAL = 600, MIN = 3, EXPIRE = 45 * 60e3;
+        const TOTAL = 360, MIN = 3, EXPIRE = 45 * 60e3;
         const $ = id => document.getElementById(id);
         const me = localStorage.rpId || (localStorage.rpId = Math.random().toString(36).slice(2, 10));
         $('name').value = localStorage.rpName || '';
         let members = {}, offset = 0, ctx, wasDone = false, loaded = false;
+        let muted = localStorage.rpMuted === '1';
+
+        /* AudioContext bei erster Interaktion aufwecken (Browser-Policy) */
+        function initAudio() {
+            if (ctx) return;
+            ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        document.addEventListener('click', initAudio, { once: true });
+        document.addEventListener('touchstart', initAudio, { once: true });
+        document.addEventListener('keydown', initAudio, { once: true });
         const now = () => Date.now() + offset;
 
         /* ---------- Speicher: Firebase REST oder lokaler Demo-Modus ---------- */
@@ -234,51 +250,259 @@
         addEventListener('beforeunload', () => { if (!demo && inPool()) fetch(url('members/' + me), { method: 'DELETE', keepalive: true }) });
 
         /* ---------- Ton ---------- */
-        function unlock() { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); ctx.resume() }
+        function unlock() { initAudio(); ctx.resume(); }
+        function toggleMute() {
+            muted = !muted;
+            localStorage.rpMuted = muted ? '1' : '0';
+            $('mutebtn').textContent = muted ? 'UNMUTE' : 'MUTE';
+        }
         function jingle() {
-            if (!ctx) return;[523, 659, 784, 1047, 784, 1047].forEach((f, i) => {
-                const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'square'; o.frequency.value = f;
-                o.connect(g); g.connect(ctx.destination); const t = ctx.currentTime + i * .2; g.gain.setValueAtTime(.15, t); g.gain.exponentialRampToValueAtTime(.001, t + .19); o.start(t); o.stop(t + .2)
-            })
+            if (!ctx || muted) return;
+            ctx.resume();
+            const delay = ctx.createDelay(0.5);
+            const feedback = ctx.createGain();
+            const delayGain = ctx.createGain();
+            delay.delayTime.value = 0.18;
+            feedback.gain.value = 0.35;
+            delayGain.gain.value = 0.4;
+            delay.connect(feedback);
+            feedback.connect(delay);
+            delay.connect(delayGain);
+            delayGain.connect(ctx.destination);
+            const notes = [523, 659, 784, 1047, 784, 1047];
+            notes.forEach((f, i) => {
+                const o = ctx.createOscillator(), g = ctx.createGain();
+                o.type = 'square'; o.frequency.value = f;
+                o.connect(g); g.connect(ctx.destination); g.connect(delay);
+                const t = ctx.currentTime + i * 0.2;
+                g.gain.setValueAtTime(0.13, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + 0.19);
+                o.start(t); o.stop(t + 0.2);
+            });
         }
 
         /* ---------- Render ---------- */
         let S = { n: 0, state: 'wait', remain: TOTAL };
         function render() {
             S = calc(); const j = !!inPool();
-            $('joinrow').hidden = j; $('leaverow').hidden = !j;
+            $('joinrow').hidden = j; $('leaverow').hidden = !j; $('resetb').hidden = S.state !== 'done';
             $('cnt').textContent = S.n; $('spd').textContent = S.state === 'run' ? S.speed.toFixed(1) + 'x' : '–';
             $('members').innerHTML = Object.values(members).filter(m => m && m.name).map(m => `<span>${m.name.replace(/[<>&"]/g, '')}</span>`).join('');
             $('status').textContent = S.state === 'wait' ? `Noch ${Math.max(0, MIN - S.n)} Person(en) fehlen …` : S.state === 'run' ? 'Countdown läuft!' : 'Zeit ist um!';
             $('go').hidden = S.state !== 'done';
-            if (S.state === 'done' && !wasDone && loaded && j) { jingle(); setTimeout(jingle, 1500) }
+            if (S.state === 'done' && !wasDone && loaded) { jingle(); setTimeout(jingle, 1500) }
             wasDone = S.state === 'done';
         }
-        /* ---------- Zigarette ---------- */
-        const cv = $('cv'), c = cv.getContext('2d'); let smoke = [];
-        function px(x, y, w, h, col) { c.fillStyle = col; c.fillRect(Math.round(x), Math.round(y), w, h) }
-        function draw() {
-            S = calc(); const frac = S.state === 'wait' ? 1 : S.remain / TOTAL;
+        /* ---------- Animation ---------- */
+        const cv = $('cv'), c = cv.getContext('2d');
+        const cv2 = $('cv2'), c2 = cv2.getContext('2d');
+        let prevT = 0, lastCompleted = 0, rollSeed = 17;
+        const fallingCigs = [];
+        $('mutebtn').textContent = muted ? 'UNMUTE' : 'MUTE';
+
+        // Geometrie Rolling-Canvas (Canvas-Pixel, 4× CSS-Skalierung)
+        const RW = 140, RH = 64;
+        const CX0 = 8, CY0 = 26, CTW = 110, CFW = 18, CTH = 12;
+        // Geometrie Stack-Canvas
+        const SX0 = 7, SCW = 108, SCFW = 18, SCH = 7, SCGAP = 4;
+
+        function tCol(x, y, seed) {
+            const v = (x * 11 + y * 7 + seed * 23 + (x * y) % 7) % 12;
+            return v < 4 ? '#6b3a18' : v < 8 ? '#7a4a20' : v < 10 ? '#8a5228' : '#9a6030';
+        }
+
+        function drawFilterOn(ctx, fx, fy, fw, fh) {
+            ctx.fillStyle = '#c88040'; ctx.fillRect(fx, fy, fw, fh);
+            ctx.fillStyle = '#e09858'; ctx.fillRect(fx, fy, fw, 2);
+            ctx.fillStyle = '#a06030'; ctx.fillRect(fx, fy + fh - 2, fw, 2);
+            for (let i = 1; i < fw; i += 3) { ctx.fillStyle = '#b07038'; ctx.fillRect(fx + i, fy + 2, 1, fh - 4); }
+            ctx.fillStyle = '#986030'; ctx.fillRect(fx + fw - 1, fy, 1, fh);
+        }
+
+        function drawTwist(ctx, x0, y0, h, len) {
+            for (let t = 0; t < len; t++) {
+                const th = Math.max(1, Math.round(h * (1 - t / len * 0.78)));
+                ctx.fillStyle = t % 2 === 0 ? '#d0ccbe' : '#b8b4a4';
+                ctx.fillRect(x0 + t, y0 + Math.floor((h - th) / 2), 1, th);
+            }
+        }
+
+        // Wie viele Zigaretten sind fertig gedreht?
+        // Letzte Zigarette fertig bei remain=0.
+        function completedCount(n, remain) {
+            if (S.state === 'done') return n;
+            if (S.state !== 'run' || n < MIN) return 0;
+            return Math.max(0, n - Math.ceil(remain * n / TOTAL));
+        }
+
+        function drawRolling(phase, seed) {
+            c.clearRect(0, 0, RW, RH);
+            const x0 = CX0, y0 = CY0, tw = CTW, fw = CFW, h = CTH;
+
+            if (phase < 0.10) {
+                // Papier entfaltet sich aus gefaltetem Blatt
+                const p = phase / 0.10;
+                const w = Math.round(tw * p), hh = Math.max(2, Math.round(h * (0.15 + 0.85 * p)));
+                const cx = x0 + (tw >> 1), cy = y0 + (h >> 1);
+                c.fillStyle = '#f2efe6';
+                c.fillRect(cx - (w >> 1), cy - (hh >> 1), w, hh);
+                if (p < 0.8) { c.fillStyle = '#c0bcac'; c.fillRect(cx - 1, cy - (hh >> 1), 2, hh); }
+                c.fillStyle = '#d0ccbc';
+                c.fillRect(cx - (w >> 1), cy - (hh >> 1), w, 1);
+                c.fillRect(cx - (w >> 1), cy + (hh >> 1) - 1, w, 1);
+
+            } else if (phase < 0.34) {
+                // Tabak fällt von oben in das offene Papier
+                const p = (phase - 0.10) / 0.24;
+                c.fillStyle = '#f2efe6'; c.fillRect(x0, y0, tw, h);
+                c.fillStyle = '#d0ccbc'; c.fillRect(x0, y0, tw, 1); c.fillRect(x0, y0 + h - 1, tw, 1);
+                const filled = Math.round(tw * Math.min(1, p * 1.15));
+                for (let px = 0; px < filled; px++)
+                    for (let py = 1; py < h - 1; py++) {
+                        if (p < 0.5 && (px + py * 3 + seed) % 4 < 1) continue;
+                        c.fillStyle = tCol(px, py, seed);
+                        c.fillRect(x0 + px, y0 + py, 1, 1);
+                    }
+                // Fallende Partikel über dem Papier
+                const t = Date.now() / 160;
+                for (let i = 0; i < 8; i++) {
+                    const px = (seed * 13 + i * 19) % (tw - 4) + 2;
+                    const dropY = Math.floor(((t + i * 0.57) % 1) * y0);
+                    c.fillStyle = tCol(px, i, seed + i * 3);
+                    c.fillRect(x0 + px, dropY, 2, 2);
+                }
+
+            } else if (phase < 0.62) {
+                // Papier rollt sich ein
+                const p = (phase - 0.34) / 0.28;
+                c.fillStyle = '#f2efe6'; c.fillRect(x0, y0, tw, h);
+                const bandH = Math.max(1, Math.round((h - 2) * (1 - p)));
+                const bandY = 1 + Math.floor(((h - 2) - bandH) / 2);
+                for (let px = 1; px < tw - 1; px++)
+                    for (let py = bandY; py < bandY + bandH; py++) {
+                        c.fillStyle = tCol(px, py, seed);
+                        c.fillRect(x0 + px, y0 + py, 1, 1);
+                    }
+                c.fillStyle = `rgba(0,0,0,${p * 0.22})`;
+                c.fillRect(x0, y0, tw, 2); c.fillRect(x0, y0 + h - 2, tw, 2);
+                const seamX = Math.round(tw * (0.5 + (1 - p) * 0.5));
+                if (seamX < tw) { c.fillStyle = '#c4c0b0'; c.fillRect(x0 + seamX, y0, 1, h); }
+                c.fillStyle = '#a8a498'; c.fillRect(x0, y0, tw, 1); c.fillRect(x0, y0 + h - 1, tw, 1);
+
+            } else if (phase < 0.76) {
+                // Filter schiebt sich von rechts ran
+                const p = (phase - 0.62) / 0.14;
+                c.fillStyle = '#f0ede3'; c.fillRect(x0, y0, tw, h);
+                c.fillStyle = '#f8f5eb'; c.fillRect(x0, y0 + 1, tw, 2);
+                c.fillStyle = '#d8d4c4'; c.fillRect(x0, y0 + h - 2, tw, 2);
+                c.fillStyle = '#e0ddd0'; c.fillRect(x0 + 8, y0 + Math.floor(h * 0.6), tw - 8, 1);
+                const fX = Math.round(x0 + tw + (RW - x0 - tw) * (1 - p));
+                drawFilterOn(c, fX, y0, fw, h);
+
+            } else if (phase < 0.93) {
+                // Ende zudrehen
+                const p = (phase - 0.76) / 0.17;
+                const twLen = Math.round(10 * p);
+                c.fillStyle = '#f0ede3'; c.fillRect(x0, y0, tw, h);
+                c.fillStyle = '#f8f5eb'; c.fillRect(x0, y0 + 1, tw, 2);
+                c.fillStyle = '#d8d4c4'; c.fillRect(x0, y0 + h - 2, tw, 2);
+                const midW = tw - fw - twLen - 2;
+                if (midW > 0) { c.fillStyle = '#e0ddd0'; c.fillRect(x0 + twLen + 2, y0 + Math.floor(h * 0.6), midW, 1); }
+                drawFilterOn(c, x0 + tw - fw, y0, fw, h);
+                drawTwist(c, x0, y0, h, twLen);
+
+            } else {
+                // Fertig, fällt gleich
+                c.fillStyle = '#f0ede3'; c.fillRect(x0, y0, tw, h);
+                c.fillStyle = '#f8f5eb'; c.fillRect(x0, y0 + 1, tw, 2);
+                c.fillStyle = '#d8d4c4'; c.fillRect(x0, y0 + h - 2, tw, 2);
+                c.fillStyle = '#e0ddd0'; c.fillRect(x0 + 12, y0 + Math.floor(h * 0.6), tw - fw - 12, 1);
+                drawFilterOn(c, x0 + tw - fw, y0, fw, h);
+                drawTwist(c, x0, y0, h, 10);
+            }
+        }
+
+        function updateAndDrawStack(dt) {
+            const N = fallingCigs.length;
+            const needed = N > 0 ? N * (SCH + SCGAP) + 16 : 1;
+            if (cv2.height !== needed) cv2.height = needed;
+            if (N === 0) return;
+            c2.clearRect(0, 0, 140, cv2.height);
+
+            const groundY = cv2.height - SCH - 4;
+            const gravity = 48;
+
+            fallingCigs.forEach(fc => {
+                if (!fc.settled) {
+                    fc.vy += gravity * dt;
+                    fc.y  += fc.vy * dt;
+                    const slotY = groundY - fc.slot * (SCH + SCGAP);
+                    if (fc.y >= slotY) {
+                        fc.y = slotY;
+                        if (Math.abs(fc.vy) > 6 && fc.bounces < 2) {
+                            fc.vy = -Math.abs(fc.vy) * 0.38;
+                            fc.bounces++;
+                        } else { fc.vy = 0; fc.settled = true; }
+                    }
+                }
+                const y = Math.round(fc.y);
+                if (y < -SCH || y > cv2.height + SCH) return;
+                c2.fillStyle = '#f0ede3'; c2.fillRect(SX0, y, SCW, SCH);
+                c2.fillStyle = '#f8f5eb'; c2.fillRect(SX0, y + 1, SCW, 1);
+                c2.fillStyle = '#d8d4c4'; c2.fillRect(SX0, y + SCH - 1, SCW, 1);
+                c2.fillStyle = '#e0ddd0'; c2.fillRect(SX0 + 5, y + Math.floor(SCH * 0.6), SCW - 5, 1);
+                drawFilterOn(c2, SX0 + SCW, y, SCFW, SCH);
+                drawTwist(c2, SX0, y, SCH, 5);
+            });
+        }
+
+        function draw(ts) {
+            const dt = prevT ? Math.min((ts - prevT) / 1000, 0.05) : 0;
+            prevT = ts;
+            S = calc();
             $('time').textContent = fmt(S.state === 'wait' ? TOTAL : S.remain);
             $('clock').textContent = new Date(now()).toLocaleTimeString('de-DE');
-            c.clearRect(0, 0, 112, 24);
-            const x0 = 4, y = 10, fil = 16, full = 84, len = Math.round(full * frac);
-            px(x0, y, fil, 5, '#d98a3d'); px(x0, y, fil, 1, '#f0b36b'); for (let i = 0; i < fil; i += 4)px(x0 + i, y + 2, 2, 1, '#b06a28');
-            const px0 = x0 + fil; px(px0, y, len, 5, '#f2efe6'); px(px0, y + 4, len, 1, '#cfcab9');
-            const tip = px0 + len;
-            if (S.state !== 'done') {
-                px(tip, y, 3, 5, '#7a7a82'); px(tip + 3, y, 1, 5, Math.floor(Date.now() / 150) % 2 ? '#ff7a1a' : '#ffd23f');
-                px(tip + 4, y + 1, 1, 3, '#e8553d');
-                if (Math.random() < 0.25 + (S.speed || 1) * 0.1) smoke.push({ x: tip + 2 + Math.random() * 2, y: y - 1, a: 1 });
-            } else { px(tip, y, 2, 5, '#4a4a52') }
-            smoke.forEach(s => { s.y -= 0.25; s.x += Math.sin(s.y) * 0.15; s.a -= 0.012; c.globalAlpha = Math.max(0, s.a); px(s.x, s.y, 1, 1, '#cfcfd8') });
-            c.globalAlpha = 1; smoke = smoke.filter(s => s.a > 0);
-            requestAnimationFrame(draw)
+
+            // Neue Runde erkannt
+            if (S.state === 'wait' && S.n === 0 && lastCompleted > 0) {
+                fallingCigs.length = 0; lastCompleted = 0; rollSeed = 17;
+            }
+
+            const n = S.n, remain = S.remain;
+
+            // Rolling-Animation
+            if (S.state === 'wait') {
+                // Langsamer Idle-Loop
+                drawRolling((Date.now() / 14000) % 0.93, rollSeed);
+            } else if (S.state === 'run') {
+                const done = completedCount(n, remain);
+                if (done < n) {
+                    const startR = TOTAL * (n - done) / n;
+                    const endR   = TOTAL * (n - done - 1) / n;
+                    const phase  = Math.max(0, Math.min(1, (startR - remain) / (startR - endR)));
+                    drawRolling(phase, rollSeed);
+                } else {
+                    c.clearRect(0, 0, RW, RH);
+                }
+            } else {
+                c.clearRect(0, 0, RW, RH);
+            }
+
+            // Fertige Zigaretten in Fallanimation starten
+            const nowDone = completedCount(n, remain);
+            while (lastCompleted < nowDone && lastCompleted < n) {
+                fallingCigs.push({ y: -SCH - 2, vy: 0.5, bounces: 0, settled: false, slot: lastCompleted });
+                rollSeed = (rollSeed * 37 + 13) % 100;
+                lastCompleted++;
+            }
+
+            updateAndDrawStack(dt);
+            requestAnimationFrame(draw);
         }
-        draw(); setInterval(render, 500);
+        requestAnimationFrame(draw); setInterval(render, 500);
 
         /* ---------- Pop-ups ---------- */
-        const MSG = ['Jetzt FAKD lesen!', 'Neue Ausgabe bald im Büro!', 'Hast du heute schon was eingereicht?', 'FAKD tagt 2x im Monat. Komm vorbei!', 'Trink ein Glas Wasser.', 'Flurfunk braucht dich!', 'Einreichen: Reiter auf der FAKD-Website'];
+        const MSG = ['Jetzt FAKD lesen!', 'Ausgaben bald wieder auf dem Gang erhältlich!', 'Hast du heute schon was eingereicht?', 'FAKD tagt 2x im Monat. Komm vorbei!', 'Trink ein Glas Wasser.', 'Flurfunk braucht dich!', 'Einreichen: Reiter auf der FAKD-Website', 'Rauchen ist tödlich.']
         const SPR = [
             ['..11111.', '.1222221', '12322221', '12222221', '.1222221', '..11111.', '..1..1..', '.11.11..'],
             ['...11...', '..1221..', '.122221.', '12222221', '12222221', '.122221.', '..1111..', '...11...'],
@@ -287,6 +511,31 @@
         function sprite(i, f) {
             const cn = document.createElement('canvas'); cn.width = cn.height = 8; cn.className = 'spr'; const x = cn.getContext('2d'); const p = PAL[i % 3];
             SPR[i % 3].forEach((row, yy) => [...row].forEach((ch, xx) => { if (ch !== '.') { x.fillStyle = p[ch - 1]; x.fillRect(xx, yy + (f ? 1 : 0) * (yy < 6 ? 0 : 0), 1, 1) } })); return cn
+        }
+        function makeDraggable(el) {
+            const bar = el.querySelector('.bar');
+            bar.style.cursor = 'grab';
+            let sx, sy, sl, st;
+            bar.addEventListener('mousedown', e => {
+                e.preventDefault();
+                sx = e.clientX; sy = e.clientY;
+                sl = parseInt(el.style.left) || 0;
+                st = parseInt(el.style.top) || 0;
+                bar.style.cursor = 'grabbing';
+                el.style.zIndex = 99;
+                function onMove(e) {
+                    el.style.left = (sl + e.clientX - sx) + 'px';
+                    el.style.top  = (st + e.clientY - sy) + 'px';
+                }
+                function onUp() {
+                    bar.style.cursor = 'grab';
+                    el.style.zIndex = 50;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                }
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
         }
         function popup() {
             if (document.hidden) return;
@@ -297,6 +546,7 @@
             const sp = sprite(i); d.querySelector('.body span').replaceWith(sp);
             let f = 0; const iv = setInterval(() => { f ^= 1; sp.style.transform = f ? 'translateY(-3px)' : 'none' }, 350);
             d.querySelector('b').onclick = () => { clearInterval(iv); d.remove() };
+            makeDraggable(d);
             document.body.appendChild(d); setTimeout(() => { clearInterval(iv); d.remove() }, 20000)
         }
         (function loop() { setTimeout(() => { if (document.querySelectorAll('.pop').length < 3) popup(); loop() }, 6000 + Math.random() * 12000) })();
