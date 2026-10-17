@@ -105,47 +105,92 @@
 
         .pop {
             position: fixed;
-            width: 230px;
+            width: 300px;
             background: #c9c6b8;
             color: #111;
             border: 3px solid #111;
-            box-shadow: 5px 5px 0 #000;
+            box-shadow: 6px 6px 0 #000;
             z-index: 50;
-            text-align: left
+            text-align: left;
+            font-size: 10px;
         }
 
         .pop .bar {
             background: #2b3a8c;
             color: #fff;
-            padding: 5px 6px;
+            padding: 6px 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 9px
+            font-size: 10px;
+            letter-spacing: 0.5px;
         }
 
         .pop .bar b {
             background: #c9c6b8;
             color: #111;
             border: 2px solid #111;
-            padding: 0 6px;
+            padding: 1px 6px;
             cursor: pointer;
-            font-size: 10px
+            font-size: 10px;
         }
 
         .pop .body {
-            padding: 10px;
+            padding: 12px;
             display: flex;
-            gap: 10px;
-            align-items: center;
-            font-size: 9px
+            gap: 12px;
+            align-items: flex-start;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .pop-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .pop-link {
+            display: inline-block;
+            background: #e8553d;
+            color: #fff;
+            text-decoration: none;
+            padding: 6px 8px;
+            border: 2px solid #111;
+            box-shadow: 2px 2px 0 #111;
+            font-size: 9px;
+            line-height: 1.4;
+            cursor: pointer;
+            word-break: break-word;
+            font-family: inherit;
+        }
+
+        .pop-link:hover {
+            background: #ff6a52;
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 #111;
+        }
+
+        .pop-link:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 #111;
+        }
+
+        .pop-link.alt {
+            background: #2b3a8c;
+        }
+
+        .pop-link.alt:hover {
+            background: #3e52b8;
         }
 
         .spr {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             flex: none;
-            image-rendering: pixelated
+            image-rendering: pixelated;
+            margin-top: 2px;
         }
 
         small {
@@ -164,7 +209,8 @@
         <div id="time">06:00</div>
         <div style="display:flex;align-items:center;justify-content:center;gap:10px">
             <div id="clock"></div>
-            <button class="alt" id="mutebtn" onclick="toggleMute()" style="font-size:9px;padding:3px 7px;border-width:2px">MUTE</button>
+            <button class="alt" id="mutebtn" onclick="toggleMute()"
+                style="font-size:9px;padding:3px 7px;border-width:2px">MUTE</button>
         </div>
         <div id="go" hidden>JETZT GEMEINSAM LOSGEHEN!</div>
         <div class="row" id="joinrow"><input id="name" maxlength="20" placeholder="Dein Name"><button
@@ -174,10 +220,12 @@
                 onclick="reset()" id="resetb">Neue Runde</button></div>
         <p>Im Pool: <b id="cnt">0</b> · Tempo: <b id="spd">–</b></p>
         <div id="members"></div>
-        <canvas id="cv2" width="140" height="1" style="display:block;margin:8px auto;image-rendering:pixelated;width:100%;max-width:560px;background:#1b1b24"></canvas>
+        <canvas id="cv2" width="140" height="1"
+            style="display:block;margin:8px auto;image-rendering:pixelated;width:100%;max-width:560px;background:#1b1b24"></canvas>
         <p><small id="mode"></small></p>
     </main>
-    <footer style="text-align:center;padding:16px 0 24px;opacity:.5;font-family:'Press Start 2P',monospace;font-size:9px;">
+    <footer
+        style="text-align:center;padding:16px 0 24px;opacity:.5;font-family:'Press Start 2P',monospace;font-size:9px;">
         Rauchen ist tödlich.
     </footer>
     <script>
@@ -300,11 +348,9 @@
         const fallingCigs = [];
         $('mutebtn').textContent = muted ? 'UNMUTE' : 'MUTE';
 
-        // Geometrie Rolling-Canvas (Canvas-Pixel, 4× CSS-Skalierung)
+        // Geometrie Zigarette (Canvas-Pixel, 4× CSS-Skalierung)
         const RW = 140, RH = 64;
         const CX0 = 8, CY0 = 26, CTW = 110, CFW = 18, CTH = 12;
-        // Geometrie Stack-Canvas
-        const SX0 = 7, SCW = 108, SCFW = 18, SCH = 7, SCGAP = 4;
 
         function tCol(x, y, seed) {
             const v = (x * 11 + y * 7 + seed * 23 + (x * y) % 7) % 12;
@@ -312,19 +358,74 @@
         }
 
         function drawFilterOn(ctx, fx, fy, fw, fh) {
-            ctx.fillStyle = '#c88040'; ctx.fillRect(fx, fy, fw, fh);
-            ctx.fillStyle = '#e09858'; ctx.fillRect(fx, fy, fw, 2);
-            ctx.fillStyle = '#a06030'; ctx.fillRect(fx, fy + fh - 2, fw, 2);
-            for (let i = 1; i < fw; i += 3) { ctx.fillStyle = '#b07038'; ctx.fillRect(fx + i, fy + 2, 1, fh - 4); }
-            ctx.fillStyle = '#986030'; ctx.fillRect(fx + fw - 1, fy, 1, fh);
+            // Weiß-gräulicher Filter (wie Slim- / Aktivkohlefilter)
+            ctx.fillStyle = '#dad6cb'; ctx.fillRect(fx, fy, fw, fh);
+            ctx.fillStyle = '#f5f3ec'; ctx.fillRect(fx, fy, fw, 2);           // Zylinder-Glanzlicht oben
+            ctx.fillStyle = '#b2aea4'; ctx.fillRect(fx, fy + fh - 2, fw, 2); // Zylinder-Schatten unten
+            for (let i = 2; i < fw; i += 3) {
+                ctx.fillStyle = '#c4c0b5';
+                ctx.fillRect(fx + i, fy + 2, 1, fh - 4);
+            }
+            ctx.fillStyle = '#9e9a90'; ctx.fillRect(fx + fw - 1, fy, 1, fh); // Rechter Rand
+            ctx.fillStyle = '#8a867c'; ctx.fillRect(fx, fy, 1, fh);          // Trennring zum Papier
         }
 
-        function drawTwist(ctx, x0, y0, h, len) {
-            for (let t = 0; t < len; t++) {
-                const th = Math.max(1, Math.round(h * (1 - t / len * 0.78)));
-                ctx.fillStyle = t % 2 === 0 ? '#d0ccbe' : '#b8b4a4';
-                ctx.fillRect(x0 + t, y0 + Math.floor((h - th) / 2), 1, th);
+        // Einheitliches Zeichnen der fertigen Zigarette (oben im Rolling-Canvas und unten im Physik-Canvas)
+        // Volle Dicke/Höhe CTH=12 (nicht schmaler werdend, gerader Zylinder),
+        // Filter rechts, gerades Tabakende links mit sichtbaren Fasern
+        function drawCigarette(ctx, cx, cy, angle = 0) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            if (angle) ctx.rotate(angle);
+
+            const halfL = CTW / 2; // 55
+            const halfH = CTH / 2; // 6
+            const x0 = -halfL;
+            const y0 = -halfH;
+            const w = CTW;         // 110
+            const h = CTH;         // 12
+            const fw = CFW;        // 18
+            const paperW = w - fw; // 92
+
+            // Weißes Papier (Zylinderform mit oberem Glanzlicht und unterem Schatten)
+            ctx.fillStyle = '#f0ede3';
+            ctx.fillRect(x0, y0, paperW, h);
+
+            // Obere Zylinder-Lichtkante
+            ctx.fillStyle = '#f8f5eb';
+            ctx.fillRect(x0 + 3, y0 + 1, paperW - 3, 2);
+            // Unterer Zylinder-Schatten
+            ctx.fillStyle = '#d8d4c4';
+            ctx.fillRect(x0 + 3, y0 + h - 3, paperW - 3, 2);
+            // Dezente Papier-Maserung / Klebelinie
+            ctx.fillStyle = '#e2ded2';
+            ctx.fillRect(x0 + 8, y0 + Math.floor(h * 0.58), paperW - 8, 1);
+
+            // Tabakspitze links: Gerades zylindrisches Ende (Höhe 12, nicht schmaler werdend!)
+            // Dunkle Tiefe im Hohlraum
+            ctx.fillStyle = '#3f1f0a';
+            ctx.fillRect(x0, y0 + 1, 3, h - 2);
+
+            // Feine Tabakfasern am offenen Rand
+            const tipColors = ['#6b3a18', '#7a4a20', '#8a5228', '#9a6030', '#5c2d12', '#7b441a'];
+            for (let ty = 1; ty < h - 1; ty++) {
+                const c1 = tipColors[(ty * 7 + 1) % tipColors.length];
+                const c2 = tipColors[(ty * 11 + 3) % tipColors.length];
+                ctx.fillStyle = c1;
+                ctx.fillRect(x0 + (ty % 2), y0 + ty, 2, 1);
+                ctx.fillStyle = c2;
+                ctx.fillRect(x0 + 2, y0 + ty, 1 + ((ty + 1) % 2), 1);
             }
+            // Winzige überstehende Fasern
+            ctx.fillStyle = '#7a4a20';
+            ctx.fillRect(x0 - 1, y0 + 3, 1, 2);
+            ctx.fillStyle = '#9a6030';
+            ctx.fillRect(x0 - 1, y0 + 7, 1, 2);
+
+            // Filter rechts
+            drawFilterOn(ctx, x0 + paperW, y0, fw, h);
+
+            ctx.restore();
         }
 
         // Wie viele Zigaretten sind fertig gedreht?
@@ -352,28 +453,48 @@
                 c.fillRect(cx - (w >> 1), cy + (hh >> 1) - 1, w, 1);
 
             } else if (phase < 0.34) {
-                // Tabak fällt von oben in das offene Papier
+                // Tabak fällt von oben in das offene Papier (Feiner Tabakregen, eher kleinere Stücke)
                 const p = (phase - 0.10) / 0.24;
                 c.fillStyle = '#f2efe6'; c.fillRect(x0, y0, tw, h);
                 c.fillStyle = '#d0ccbc'; c.fillRect(x0, y0, tw, 1); c.fillRect(x0, y0 + h - 1, tw, 1);
-                const filled = Math.round(tw * Math.min(1, p * 1.15));
-                for (let px = 0; px < filled; px++)
-                    for (let py = 1; py < h - 1; py++) {
-                        if (p < 0.5 && (px + py * 3 + seed) % 4 < 1) continue;
+
+                // Tabakbett im Papier baut sich von unten nach oben organisch auf
+                const filledH = Math.min(h - 2, Math.max(1, Math.round((h - 2) * p * 1.12)));
+                const startY = y0 + h - 1 - filledH;
+                for (let px = 2; px < tw - 2; px++) {
+                    const wave = Math.sin(px * 0.45 + seed) * 0.9 + Math.cos(px * 0.85 + seed * 2) * 0.6;
+                    const pyStart = Math.min(y0 + h - 2, Math.max(y0 + 1, Math.round(startY + wave)));
+                    for (let py = pyStart; py < y0 + h - 1; py++) {
                         c.fillStyle = tCol(px, py, seed);
-                        c.fillRect(x0 + px, y0 + py, 1, 1);
+                        c.fillRect(x0 + px, py, 1, 1);
                     }
-                // Fallende Partikel über dem Papier
-                const t = Date.now() / 160;
-                for (let i = 0; i < 8; i++) {
-                    const px = (seed * 13 + i * 19) % (tw - 4) + 2;
-                    const dropY = Math.floor(((t + i * 0.57) % 1) * y0);
-                    c.fillStyle = tCol(px, i, seed + i * 3);
-                    c.fillRect(x0 + px, dropY, 2, 2);
+                }
+
+                // Tabakregen: Feinere, eher kleinere Tabakstückchen (1x1 und kleine 1x2 Flöckchen)
+                const rainTime = Date.now() / 1000;
+                const numParticles = 40;
+                for (let i = 0; i < numParticles; i++) {
+                    const spd = 20 + ((i * 19 + seed * 11) % 25);
+                    const cycle = (rainTime * spd + i * 7.7) % (y0 + 6);
+                    const dropY = cycle - 3;
+                    if (dropY < 0 || dropY > y0 + 3) continue;
+
+                    const baseX = 3 + ((i * 37 + seed * 17) % (tw - 8));
+                    const wobble = Math.sin(rainTime * 4.5 + i * 2.2) * 1.2;
+                    const dropX = Math.round(x0 + baseX + wobble);
+
+                    c.fillStyle = tCol(dropX, Math.floor(dropY), seed + i * 7);
+                    if (i % 4 === 0) {
+                        c.fillRect(dropX, Math.floor(dropY), 1, 2); // 1x2 dünne Faser
+                    } else if (i % 7 === 0) {
+                        c.fillRect(dropX, Math.floor(dropY), 2, 1); // 2x1 feines Plättchen
+                    } else {
+                        c.fillRect(dropX, Math.floor(dropY), 1, 1); // 1x1 kleines Tabakstück
+                    }
                 }
 
             } else if (phase < 0.62) {
-                // Papier rollt sich ein
+                // Papier rollt sich um den Tabak ein (volle Zylinderhöhe CTH=12)
                 const p = (phase - 0.34) / 0.28;
                 c.fillStyle = '#f2efe6'; c.fillRect(x0, y0, tw, h);
                 const bandH = Math.max(1, Math.round((h - 2) * (1 - p)));
@@ -390,69 +511,339 @@
                 c.fillStyle = '#a8a498'; c.fillRect(x0, y0, tw, 1); c.fillRect(x0, y0 + h - 1, tw, 1);
 
             } else if (phase < 0.76) {
-                // Filter schiebt sich von rechts ran
+                // Filter schiebt sich von rechts heran (gerader Zylinder, Höhe 12)
                 const p = (phase - 0.62) / 0.14;
                 c.fillStyle = '#f0ede3'; c.fillRect(x0, y0, tw, h);
                 c.fillStyle = '#f8f5eb'; c.fillRect(x0, y0 + 1, tw, 2);
                 c.fillStyle = '#d8d4c4'; c.fillRect(x0, y0 + h - 2, tw, 2);
-                c.fillStyle = '#e0ddd0'; c.fillRect(x0 + 8, y0 + Math.floor(h * 0.6), tw - 8, 1);
+                c.fillStyle = '#e0ddd0'; c.fillRect(x0 + 8, y0 + Math.floor(h * 0.58), tw - 8, 1);
+
+                // Tabakende links bereits sichtbar (gerade Kante, Höhe 12, nicht schmaler!)
+                c.fillStyle = '#3f1f0a'; c.fillRect(x0, y0 + 1, 3, h - 2);
+                for (let ty = 1; ty < h - 1; ty++) {
+                    c.fillStyle = tCol(x0, ty, seed + ty);
+                    c.fillRect(x0 + (ty % 2), y0 + ty, 2, 1);
+                }
+
                 const fX = Math.round(x0 + tw + (RW - x0 - tw) * (1 - p));
                 drawFilterOn(c, fX, y0, fw, h);
 
             } else if (phase < 0.93) {
-                // Ende zudrehen
+                // Fertigstellen & Zukleben: bleibt zylindrisch mit voller Höhe CTH=12 (nicht schmaler werdend!)
                 const p = (phase - 0.76) / 0.17;
-                const twLen = Math.round(10 * p);
                 c.fillStyle = '#f0ede3'; c.fillRect(x0, y0, tw, h);
                 c.fillStyle = '#f8f5eb'; c.fillRect(x0, y0 + 1, tw, 2);
                 c.fillStyle = '#d8d4c4'; c.fillRect(x0, y0 + h - 2, tw, 2);
-                const midW = tw - fw - twLen - 2;
-                if (midW > 0) { c.fillStyle = '#e0ddd0'; c.fillRect(x0 + twLen + 2, y0 + Math.floor(h * 0.6), midW, 1); }
+                c.fillStyle = '#e0ddd0'; c.fillRect(x0 + 8, y0 + Math.floor(h * 0.58), tw - fw - 8, 1);
+
+                // Tabakende links (gerader Zylinder, Höhe 12)
+                c.fillStyle = '#3f1f0a'; c.fillRect(x0, y0 + 1, 3, h - 2);
+                for (let ty = 1; ty < h - 1; ty++) {
+                    c.fillStyle = tCol(x0, ty, seed + ty);
+                    c.fillRect(x0 + (ty % 2), y0 + ty, 2, 1);
+                }
+                c.fillStyle = '#7a4a20'; c.fillRect(x0 - 1, y0 + 3, 1, 2);
+                c.fillStyle = '#9a6030'; c.fillRect(x0 - 1, y0 + 7, 1, 2);
+
+                // Filter rechts
                 drawFilterOn(c, x0 + tw - fw, y0, fw, h);
-                drawTwist(c, x0, y0, h, twLen);
+
+                // Glanzstreifen beim Glattstreichen der Klebenaht
+                const shineX = Math.round(x0 + (tw - fw) * p);
+                c.fillStyle = 'rgba(255,255,255,0.4)';
+                c.fillRect(shineX - 2, y0 + 1, 4, h - 2);
 
             } else {
-                // Fertig, fällt gleich
-                c.fillStyle = '#f0ede3'; c.fillRect(x0, y0, tw, h);
-                c.fillStyle = '#f8f5eb'; c.fillRect(x0, y0 + 1, tw, 2);
-                c.fillStyle = '#d8d4c4'; c.fillRect(x0, y0 + h - 2, tw, 2);
-                c.fillStyle = '#e0ddd0'; c.fillRect(x0 + 12, y0 + Math.floor(h * 0.6), tw - fw - 12, 1);
-                drawFilterOn(c, x0 + tw - fw, y0, fw, h);
-                drawTwist(c, x0, y0, h, 10);
+                // Fertig gerollte Zigarette (sieht 100% genauso aus wie die fallende!)
+                const cx = x0 + tw / 2;
+                const cy = y0 + h / 2;
+                if (phase < 0.97) {
+                    drawCigarette(c, cx, cy, 0);
+                } else {
+                    // Kippt leicht an und fällt nach unten aus dem Canvas
+                    const dropP = (phase - 0.97) / 0.03;
+                    const dropY = cy + dropP * dropP * 28;
+                    const dropRot = dropP * 0.12;
+                    drawCigarette(c, cx, dropY, dropRot);
+                }
             }
+        }
+
+        // Tabakbrösel bei Aufprall
+        const looseCrumbs = [];
+        function spawnImpactCrumbs(x, y, count = 2) {
+            if (looseCrumbs.length > 50) looseCrumbs.splice(0, count);
+            const cols = ['#6b3a18', '#7a4a20', '#8a5228', '#9a6030', '#5a2d10'];
+            for (let i = 0; i < count; i++) {
+                looseCrumbs.push({
+                    x: x + (Math.random() - 0.5) * 3,
+                    y: y + (Math.random() - 0.5) * 2,
+                    vx: (Math.random() - 0.5) * 22,
+                    vy: -Math.random() * 16 - 3,
+                    col: cols[Math.floor(Math.random() * cols.length)]
+                });
+            }
+        }
+
+        // 2D Starrkörper-Physik für fallende und kollidierende Zigaretten
+        function getCorners(cig) {
+            const cos = Math.cos(cig.angle), sin = Math.sin(cig.angle);
+            const hl = CTW / 2; // 55
+            const hh = CTH / 2; // 6
+            return [
+                { x: hl * cos - hh * sin, y: hl * sin + hh * cos },
+                { x: -hl * cos - hh * sin, y: -hl * sin + hh * cos },
+                { x: -hl * cos + hh * sin, y: -hl * sin - hh * cos },
+                { x: hl * cos + hh * sin, y: hl * sin - hh * cos }
+            ];
+        }
+
+        function solveCigCollision(A, B) {
+            const dx = B.x - A.x, dy = B.y - A.y;
+            const hl = CTW / 2, hh = CTH / 2;
+            const rBound = Math.hypot(hl, hh);
+            if (dx * dx + dy * dy > (rBound * 2) * (rBound * 2)) return;
+
+            const cosA = Math.cos(A.angle), sinA = Math.sin(A.angle);
+            const cosB = Math.cos(B.angle), sinB = Math.sin(B.angle);
+
+            // 4 Trennachsen nach SAT (Separating Axis Theorem)
+            const axes = [
+                { x: cosA, y: sinA },
+                { x: -sinA, y: cosA },
+                { x: cosB, y: sinB },
+                { x: -sinB, y: cosB }
+            ];
+
+            let minOverlap = Infinity;
+            let bestAxis = null;
+
+            for (let i = 0; i < 4; i++) {
+                const ax = axes[i].x, ay = axes[i].y;
+                const rA = hl * Math.abs(cosA * ax + sinA * ay) + hh * Math.abs(-sinA * ax + cosA * ay);
+                const rB = hl * Math.abs(cosB * ax + sinB * ay) + hh * Math.abs(-sinB * ax + cosB * ay);
+                const dist = Math.abs(dx * ax + dy * ay);
+                const overlap = (rA + rB) - dist;
+                if (overlap <= 0) return; // Trennachse gefunden -> keine Kollision
+                if (overlap < minOverlap) {
+                    minOverlap = overlap;
+                    bestAxis = { x: ax, y: ay };
+                }
+            }
+
+            // Normale so ausrichten, dass sie von B nach A zeigt
+            let nx = bestAxis.x, ny = bestAxis.y;
+            if ((A.x - B.x) * nx + (A.y - B.y) * ny < 0) {
+                nx = -nx; ny = -ny;
+            }
+
+            // Kontaktpunkt bestimmen (tiefst eindringende Ecke)
+            const cornersA = getCorners(A);
+            const cornersB = getCorners(B);
+            let deepestPen = -Infinity;
+            let contactX = (A.x + B.x) / 2, contactY = (A.y + B.y) / 2;
+
+            cornersA.forEach(c => {
+                const wx = A.x + c.x, wy = A.y + c.y;
+                const pen = -((wx - B.x) * nx + (wy - B.y) * ny);
+                if (pen > deepestPen) { deepestPen = pen; contactX = wx; contactY = wy; }
+            });
+            cornersB.forEach(c => {
+                const wx = B.x + c.x, wy = B.y + c.y;
+                const pen = (wx - A.x) * nx + (wy - A.y) * ny;
+                if (pen > deepestPen) { deepestPen = pen; contactX = wx; contactY = wy; }
+            });
+
+            // Hebelarme zum Kontaktpunkt
+            const rax = contactX - A.x, ray = contactY - A.y;
+            const rbx = contactX - B.x, rby = contactY - B.y;
+
+            // Relativgeschwindigkeit am Kontaktpunkt
+            const vAx = A.vx - A.omega * ray, vAy = A.vy + A.omega * rax;
+            const vBx = B.vx - B.omega * rby, vBy = B.vy + B.omega * rbx;
+            const vRelX = vAx - vBx, vRelY = vAy - vBy;
+            const vn = vRelX * nx + vRelY * ny;
+
+            if (vn < 0) {
+                const mA = 1.0, mB = 1.0;
+                const IA = 420, IB = 420;
+                const e = 0.25;
+
+                const crossA = rax * ny - ray * nx;
+                const crossB = rbx * ny - rby * nx;
+                const denomN = (1 / mA + 1 / mB) + (crossA * crossA) / IA + (crossB * crossB) / IB;
+                const jn = -(1 + e) * vn / denomN;
+
+                A.vx += (jn * nx) / mA;
+                A.vy += (jn * ny) / mA;
+                A.omega += (crossA * jn) / IA;
+
+                B.vx -= (jn * nx) / mB;
+                B.vy -= (jn * ny) / mB;
+                B.omega -= (crossB * jn) / IB;
+
+                // Reibung / Tangentialimpuls
+                const tx = -ny, ty = nx;
+                const vt = vRelX * tx + vRelY * ty;
+                const crossAt = rax * ty - ray * tx;
+                const crossBt = rbx * ty - rby * tx;
+                const denomT = (1 / mA + 1 / mB) + (crossAt * crossAt) / IA + (crossBt * crossBt) / IB;
+                let jt = -vt / denomT;
+                const maxFriction = 0.45 * jn;
+                jt = Math.max(-maxFriction, Math.min(maxFriction, jt));
+
+                A.vx += (jt * tx) / mA;
+                A.vy += (jt * ty) / mA;
+                A.omega += (crossAt * jt) / IA;
+
+                B.vx -= (jt * tx) / mB;
+                B.vy -= (jt * ty) / mB;
+                B.omega -= (crossBt * jt) / IB;
+
+                if (Math.abs(vn) > 10) spawnImpactCrumbs(contactX, contactY, 2);
+            }
+
+            // Positionskorrektur (Vermeidet Durchdringen)
+            const corr = minOverlap * 0.52;
+            A.x += nx * corr; A.y += ny * corr;
+            B.x -= nx * corr; B.y -= ny * corr;
+            A.settled = false; B.settled = false;
         }
 
         function updateAndDrawStack(dt) {
             const N = fallingCigs.length;
-            const needed = N > 0 ? N * (SCH + SCGAP) + 16 : 1;
-            if (cv2.height !== needed) cv2.height = needed;
-            if (N === 0) return;
-            c2.clearRect(0, 0, 140, cv2.height);
+            if (N === 0) {
+                if (cv2.height !== 0) cv2.height = 0;
+                cv2.style.display = 'none';
+                return;
+            }
+            cv2.style.display = 'block';
+            const targetH = Math.min(140, Math.max(88, 80 + Math.max(0, N - 2) * 8));
+            if (cv2.height !== targetH) cv2.height = targetH;
+            c2.clearRect(0, 0, cv2.width, cv2.height);
 
-            const groundY = cv2.height - SCH - 4;
-            const gravity = 48;
+            const floorY = cv2.height - 4;
+            // Boden-Linie / Aschefläche
+            c2.fillStyle = '#22222d';
+            c2.fillRect(0, floorY + 2, cv2.width, cv2.height - floorY);
+            c2.fillStyle = '#2e2e3d';
+            c2.fillRect(0, floorY + 1, cv2.width, 1);
 
-            fallingCigs.forEach(fc => {
-                if (!fc.settled) {
-                    fc.vy += gravity * dt;
-                    fc.y  += fc.vy * dt;
-                    const slotY = groundY - fc.slot * (SCH + SCGAP);
-                    if (fc.y >= slotY) {
-                        fc.y = slotY;
-                        if (Math.abs(fc.vy) > 6 && fc.bounces < 2) {
-                            fc.vy = -Math.abs(fc.vy) * 0.38;
-                            fc.bounces++;
-                        } else { fc.vy = 0; fc.settled = true; }
+            const gravity = 180;
+            const subSteps = 4;
+            const sdt = dt / subSteps;
+            const hl = CTW / 2, hh = CTH / 2;
+            const mass = 1.0, inertia = 420;
+
+            for (let step = 0; step < subSteps; step++) {
+                fallingCigs.forEach(fc => {
+                    if (fc.settled) return;
+
+                    // Schwerkraft & Dämpfung
+                    fc.vy += gravity * sdt;
+                    fc.vx *= Math.pow(0.985, sdt * 60);
+                    fc.vy *= Math.pow(0.995, sdt * 60);
+                    fc.omega *= Math.pow(0.96, sdt * 60);
+
+                    fc.x += fc.vx * sdt;
+                    fc.y += fc.vy * sdt;
+                    fc.angle += fc.omega * sdt;
+
+                    const corners = getCorners(fc);
+
+                    // Boden-Kollision für alle 4 Ecken
+                    let onFloor = false;
+                    corners.forEach(c => {
+                        const wy = fc.y + c.y;
+                        if (wy > floorY) {
+                            onFloor = true;
+                            const pen = wy - floorY;
+                            const pvx = fc.vx - fc.omega * c.y;
+                            const pvy = fc.vy + fc.omega * c.x;
+
+                            if (pvy > 0) {
+                                const denom = (1 / mass) + (c.x * c.x) / inertia;
+                                const jn = -(1 + 0.28) * pvy / denom;
+                                fc.vy += jn / mass;
+                                fc.omega += (c.x * jn) / inertia;
+
+                                // Bodenreibung
+                                const denomT = (1 / mass) + (c.y * c.y) / inertia;
+                                let jt = -pvx / denomT;
+                                const maxMu = 0.5 * Math.abs(jn);
+                                jt = Math.max(-maxMu, Math.min(maxMu, jt));
+                                fc.vx += jt / mass;
+                                fc.omega -= (c.y * jt) / inertia;
+
+                                if (pvy > 12) spawnImpactCrumbs(fc.x + c.x, floorY, 2);
+                            }
+                            fc.y -= pen * 0.75;
+                            fc.angle -= (c.x * pen / (hl * hl)) * 0.45;
+                        }
+                    });
+
+                    // Wand-Kollision (x = 2 und x = 138)
+                    corners.forEach(c => {
+                        const wx = fc.x + c.x;
+                        if (wx < 2) {
+                            const pen = 2 - wx;
+                            const pvx = fc.vx - fc.omega * c.y;
+                            if (pvx < 0) {
+                                const jn = -(1 + 0.3) * pvx / (1 / mass + (c.y * c.y) / inertia);
+                                fc.vx += jn / mass;
+                                fc.omega -= (c.y * jn) / inertia;
+                            }
+                            fc.x += pen;
+                        } else if (wx > 138) {
+                            const pen = wx - 138;
+                            const pvx = fc.vx - fc.omega * c.y;
+                            if (pvx > 0) {
+                                const jn = -(1 + 0.3) * pvx / (1 / mass + (c.y * c.y) / inertia);
+                                fc.vx += jn / mass;
+                                fc.omega -= (c.y * jn) / inertia;
+                            }
+                            fc.x -= pen;
+                        }
+                    });
+
+                    // Ruhe-Zustand prüfen
+                    if (onFloor && Math.abs(fc.vx) < 0.25 && Math.abs(fc.vy) < 0.3 && Math.abs(fc.omega) < 0.06) {
+                        fc.sleepTimer = (fc.sleepTimer || 0) + 1;
+                        if (fc.sleepTimer > 35) {
+                            fc.settled = true;
+                            fc.vx = 0; fc.vy = 0; fc.omega = 0;
+                        }
+                    } else {
+                        fc.sleepTimer = 0;
+                    }
+                });
+
+                // Zigarette-an-Zigarette Kollisionen prüfen
+                for (let i = 0; i < N; i++) {
+                    for (let j = i + 1; j < N; j++) {
+                        solveCigCollision(fallingCigs[i], fallingCigs[j]);
                     }
                 }
-                const y = Math.round(fc.y);
-                if (y < -SCH || y > cv2.height + SCH) return;
-                c2.fillStyle = '#f0ede3'; c2.fillRect(SX0, y, SCW, SCH);
-                c2.fillStyle = '#f8f5eb'; c2.fillRect(SX0, y + 1, SCW, 1);
-                c2.fillStyle = '#d8d4c4'; c2.fillRect(SX0, y + SCH - 1, SCW, 1);
-                c2.fillStyle = '#e0ddd0'; c2.fillRect(SX0 + 5, y + Math.floor(SCH * 0.6), SCW - 5, 1);
-                drawFilterOn(c2, SX0 + SCW, y, SCFW, SCH);
-                drawTwist(c2, SX0, y, SCH, 5);
+            }
+
+            // Tabakbrösel / Asche aktualisieren und zeichnen
+            for (let i = looseCrumbs.length - 1; i >= 0; i--) {
+                const cr = looseCrumbs[i];
+                cr.vy += 120 * dt;
+                cr.x += cr.vx * dt;
+                cr.y += cr.vy * dt;
+                if (cr.y >= floorY) {
+                    cr.y = floorY;
+                    cr.vy = -cr.vy * 0.25;
+                    cr.vx *= 0.7;
+                }
+                c2.fillStyle = cr.col;
+                c2.fillRect(Math.round(cr.x), Math.round(cr.y), 1, 1);
+            }
+
+            // Alle Zigaretten mit voller Dicke & identischem Look zeichnen
+            fallingCigs.forEach(fc => {
+                drawCigarette(c2, Math.round(fc.x), Math.round(fc.y), fc.angle);
             });
         }
 
@@ -465,7 +856,7 @@
 
             // Neue Runde erkannt
             if (S.state === 'wait' && S.n === 0 && lastCompleted > 0) {
-                fallingCigs.length = 0; lastCompleted = 0; rollSeed = 17;
+                fallingCigs.length = 0; looseCrumbs.length = 0; lastCompleted = 0; rollSeed = 17;
             }
 
             const n = S.n, remain = S.remain;
@@ -478,8 +869,8 @@
                 const done = completedCount(n, remain);
                 if (done < n) {
                     const startR = TOTAL * (n - done) / n;
-                    const endR   = TOTAL * (n - done - 1) / n;
-                    const phase  = Math.max(0, Math.min(1, (startR - remain) / (startR - endR)));
+                    const endR = TOTAL * (n - done - 1) / n;
+                    const phase = Math.max(0, Math.min(1, (startR - remain) / (startR - endR)));
                     drawRolling(phase, rollSeed);
                 } else {
                     c.clearRect(0, 0, RW, RH);
@@ -488,10 +879,20 @@
                 c.clearRect(0, 0, RW, RH);
             }
 
-            // Fertige Zigaretten in Fallanimation starten
+            // Fertige Zigaretten in Fallanimation mit Physik starten
             const nowDone = completedCount(n, remain);
             while (lastCompleted < nowDone && lastCompleted < n) {
-                fallingCigs.push({ y: -SCH - 2, vy: 0.5, bounces: 0, settled: false, slot: lastCompleted });
+                const spawnX = CX0 + CTW / 2 + (Math.random() - 0.5) * 12;
+                fallingCigs.push({
+                    x: spawnX,
+                    y: -12,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: 24 + Math.random() * 12,
+                    angle: (Math.random() - 0.5) * 0.16,
+                    omega: (Math.random() - 0.5) * 1.0,
+                    settled: false,
+                    sleepTimer: 0
+                });
                 rollSeed = (rollSeed * 37 + 13) % 100;
                 lastCompleted++;
             }
@@ -502,7 +903,64 @@
         requestAnimationFrame(draw); setInterval(render, 500);
 
         /* ---------- Pop-ups ---------- */
-        const MSG = ['Jetzt FAKD lesen!', 'Ausgaben bald wieder auf dem Gang erhältlich!', 'Hast du heute schon was eingereicht?', 'FAKD tagt 2x im Monat. Komm vorbei!', 'Trink ein Glas Wasser.', 'Flurfunk braucht dich!', 'Einreichen: Reiter auf der FAKD-Website', 'Rauchen ist tödlich.']
+        const POPUPS = [
+            {
+                title: 'INSTA.exe',
+                text: 'Schon den Flurfunk auf Instagram gecheckt?',
+                btn: '@the.fakd auschecken',
+                url: 'https://www.instagram.com/the.fakd/',
+                alt: false
+            },
+            {
+                title: 'MAGAZIN.sys',
+                text: 'Lust auf frischen Lesestoff zur Kippe?',
+                btn: 'FAKD Magazin online lesen',
+                url: 'https://thefakd.com/#start',
+                alt: true
+            },
+            {
+                title: 'DROP_ALERT.dll',
+                text: 'Neuste Ausgabe, Drops & Stories:',
+                btn: 'Folge @the.fakd auf Insta',
+                url: 'https://www.instagram.com/the.fakd/',
+                alt: false
+            },
+            {
+                title: 'SUBMIT.bat',
+                text: 'Hast du was zu erzählen? Wir suchen Texte & Kunst!',
+                btn: 'Jetzt bei FAKD einreichen',
+                url: 'https://thefakd.com/#start',
+                alt: true
+            },
+            {
+                title: 'ARCHIV.exe',
+                text: 'Ausgaben auf dem Gang verpasst? Kein Problem:',
+                btn: 'thefakd.com direkt öffnen',
+                url: 'https://thefakd.com/#start',
+                alt: true
+            },
+            {
+                title: 'COMMUNITY.sys',
+                text: 'Tagge uns bei deiner nächsten Rauchpause:',
+                btn: 'Zeig es @the.fakd',
+                url: 'https://www.instagram.com/the.fakd/',
+                alt: false
+            },
+            {
+                title: 'PLENUM.exe',
+                text: 'FAKD tagt 2x im Monat. Komm vorbei oder lies online mit!',
+                btn: 'Alle Infos auf thefakd.com',
+                url: 'https://thefakd.com/#start',
+                alt: true
+            },
+            {
+                title: 'FAKD_CARE.dll',
+                text: 'Rauchen ist tödlich. FAKD ist für immer.',
+                btn: 'Zum Magazin-Start',
+                url: 'https://thefakd.com/#start',
+                alt: false
+            }
+        ];
         const SPR = [
             ['..11111.', '.1222221', '12322221', '12222221', '.1222221', '..11111.', '..1..1..', '.11.11..'],
             ['...11...', '..1221..', '.122221.', '12222221', '12222221', '.122221.', '..1111..', '...11...'],
@@ -525,7 +983,7 @@
                 el.style.zIndex = 99;
                 function onMove(e) {
                     el.style.left = (sl + e.clientX - sx) + 'px';
-                    el.style.top  = (st + e.clientY - sy) + 'px';
+                    el.style.top = (st + e.clientY - sy) + 'px';
                 }
                 function onUp() {
                     bar.style.cursor = 'grab';
@@ -540,14 +998,18 @@
         function popup() {
             if (document.hidden) return;
             const d = document.createElement('div'); d.className = 'pop';
-            d.style.left = Math.random() * Math.max(10, innerWidth - 250) + 'px'; d.style.top = (60 + Math.random() * Math.max(10, innerHeight - 200)) + 'px';
+            d.style.left = Math.random() * Math.max(10, innerWidth - 320) + 'px';
+            d.style.top = (60 + Math.random() * Math.max(10, innerHeight - 220)) + 'px';
+            const item = POPUPS[Math.floor(Math.random() * POPUPS.length)];
             const i = Math.floor(Math.random() * 3);
-            d.innerHTML = `<div class="bar"><span>FAKD.exe</span><b>X</b></div><div class="body"><span></span><span>${MSG[Math.floor(Math.random() * MSG.length)]}</span></div>`;
-            const sp = sprite(i); d.querySelector('.body span').replaceWith(sp);
+            d.innerHTML = `<div class="bar"><span>${item.title}</span><b>X</b></div><div class="body"><span class="spr-slot"></span><div class="pop-content"><div>${item.text}</div><a class="pop-link ${item.alt ? 'alt' : ''}" href="${item.url}" target="_blank" rel="noopener noreferrer">${item.btn}</a></div></div>`;
+            const sp = sprite(i);
+            d.querySelector('.spr-slot').replaceWith(sp);
             let f = 0; const iv = setInterval(() => { f ^= 1; sp.style.transform = f ? 'translateY(-3px)' : 'none' }, 350);
             d.querySelector('b').onclick = () => { clearInterval(iv); d.remove() };
             makeDraggable(d);
-            document.body.appendChild(d); setTimeout(() => { clearInterval(iv); d.remove() }, 20000)
+            document.body.appendChild(d);
+            setTimeout(() => { clearInterval(iv); d.remove() }, 22000);
         }
         (function loop() { setTimeout(() => { if (document.querySelectorAll('.pop').length < 3) popup(); loop() }, 6000 + Math.random() * 12000) })();
 
