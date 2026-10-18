@@ -9,7 +9,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
+        }
+
+        [hidden] {
+            display: none !important;
         }
 
         body {
@@ -17,84 +21,210 @@
             background: #1b1b24;
             color: #f2efe6;
             font-family: 'Press Start 2P', monospace, system-ui;
-            font-size: 11px;
-            line-height: 1.7;
+            font-size: 10px;
+            line-height: 1.6;
             min-height: 100vh;
-            overflow-x: hidden
+            overflow-x: hidden;
         }
 
         main {
-            max-width: 640px;
+            max-width: 580px;
             margin: auto;
-            padding: 24px 16px;
-            text-align: center
+            padding: 22px 14px;
+            text-align: center;
         }
 
         h1 {
-            font-size: 16px;
-            margin: 8px 0
+            font-size: 14px;
+            margin: 8px 0 10px;
+            letter-spacing: 0.5px;
+        }
+
+        small {
+            display: inline-block;
+            margin-bottom: 8px;
+            line-height: 1.8;
+            opacity: .6;
+            font-size: 9px;
+        }
+
+        #status {
+            margin: 10px 0 14px;
         }
 
         canvas {
             image-rendering: pixelated;
             width: 100%;
             max-width: 560px;
-            background: #1b1b24
+            background: #1b1b24;
+        }
+
+        #timer-box {
+            position: relative;
+            margin: 6px auto 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 82px;
         }
 
         #time {
-            font-size: 40px;
-            margin: 12px 0
+            display: inline-block;
+            font-size: 38px;
+            margin: 6px 0;
+            padding: 10px 22px;
+            background: rgba(18, 18, 24, 0.92);
+            border: 2px solid #36364a;
+            box-shadow: 0 0 0 2px #000, 3px 3px 0 #000;
+            color: #ffffff;
+            text-shadow: 
+                -2px -2px 0 #000, 2px -2px 0 #000, 
+                -2px 2px 0 #000, 2px 2px 0 #000,
+                0 3px 0 #000, 3px 3px 0 #000;
+            letter-spacing: 1px;
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+        }
+
+        .is-done #time {
+            transform: translateY(-56px);
         }
 
         #clock {
-            opacity: .6
+            display: inline-block;
+            background: #121218;
+            border: 2px solid #36364a;
+            box-shadow: 0 0 0 1px #000, 2px 2px 0 #000;
+            padding: 6px 11px;
+            font-size: 8px;
+            color: #f2efe6;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        #stage-content p {
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+            margin: 8px 0;
+            font-size: 9px;
         }
 
         button,
         input {
             font: inherit;
-            font-size: 11px;
-            padding: 12px;
-            border: 3px solid #f2efe6;
+            font-size: 9px;
+            padding: 9px 14px;
+            border: 2px solid #f2efe6;
             background: #1b1b24;
             color: #f2efe6;
-            border-radius: 0
+            border-radius: 0;
+            box-shadow: 0 0 0 1px #000, 2px 2px 0 #000;
+        }
+
+        #name {
+            max-width: 170px;
         }
 
         button {
             cursor: pointer;
             background: #e8553d;
-            color: #fff
+            color: #fff;
+            text-shadow: 1px 1px 0 #000;
         }
 
         button.alt {
-            background: #1b1b24
+            background: #1b1b24;
         }
 
         button:active {
-            transform: translate(2px, 2px)
+            transform: translate(1px, 1px);
+            box-shadow: 0 0 0 1px #000, 1px 1px 0 #000;
         }
 
         .row {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
-            margin: 12px 0
+            margin: 14px 0;
+        }
+
+        #pool-box {
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+            margin: 14px auto 0;
+            padding: 14px 16px 16px;
+            background: rgba(18, 18, 24, 0.94);
+            border: 2px solid #36364a;
+            box-shadow: 0 0 0 2px #000, 3px 3px 0 #000;
+            position: relative;
+            z-index: 2;
+        }
+
+        #pool-meta {
+            font-size: 9px;
+            color: #f2efe6;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        #pool-meta b {
+            color: #ffd23f;
+            font-weight: normal;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        #members {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            min-height: 24px;
+            align-items: center;
+        }
+
+        #members:empty::after {
+            content: "Noch niemand im Pool";
+            font-size: 8px;
+            opacity: .5;
+            color: #f2efe6;
+            display: block;
+            padding: 4px 0;
         }
 
         #members span {
-            display: inline-block;
-            border: 2px solid #f2efe6;
-            padding: 4px 8px;
-            margin: 3px
+            display: inline-flex;
+            align-items: center;
+            background: #0c0c12;
+            color: #ffffff;
+            padding: 6px 12px;
+            font-size: 9px;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 0 #000;
         }
 
         #go {
             color: #ffd23f;
-            font-size: 16px;
-            animation: b .6s steps(2) infinite
+            font-size: clamp(10px, 3.2vw, 13px);
+            display: inline-block;
+            margin: 0;
+            padding: 8px 18px;
+            background: #14141d;
+            border: 2px solid #ffd23f;
+            box-shadow: 0 0 0 2px #000, 3px 3px 0 #000;
+            animation: b .6s steps(2) infinite;
+            text-shadow: 1px 1px 0 #000;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            max-width: 95vw;
+            box-sizing: border-box;
+        }
+
+        #go[hidden] {
+            display: none !important;
         }
 
         @keyframes b {
@@ -106,6 +236,7 @@
         .pop {
             position: fixed;
             width: 300px;
+            max-width: calc(100vw - 20px);
             background: #c9c6b8;
             color: #111;
             border: 3px solid #111;
@@ -206,26 +337,33 @@
         <small>Mind. 3 Leute im Pool → 6 Min Countdown. Je mehr, desto schneller.</small>
         <p id="status"></p>
         <canvas id="cv" width="140" height="64"></canvas>
-        <div id="time">06:00</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:10px">
-            <div id="clock"></div>
-            <button class="alt" id="mutebtn" onclick="toggleMute()"
-                style="font-size:9px;padding:3px 7px;border-width:2px">MUTE</button>
+        <div id="stage" style="position:relative;width:100%;max-width:560px;margin:0 auto;min-height:220px">
+            <canvas id="cv2"
+                style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;background:transparent;"></canvas>
+            <div id="stage-content" style="position:relative;z-index:1;pointer-events:auto;padding-bottom:84px">
+                <div id="timer-box">
+                    <div id="time">06:00</div>
+                    <div id="go" hidden>JETZT GEMEINSAM LOSGEHEN!</div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0;">
+                    <div id="clock"></div>
+                    <button class="alt" id="mutebtn" onclick="toggleMute()"
+                        style="font-size:8px;padding:6px 10px;border-width:2px">TON: AN</button>
+                </div>
+                <div class="row" id="joinrow"><input id="name" maxlength="20" placeholder="Dein Name"><button
+                        onclick="join()">Pool beitreten</button></div>
+                <div class="row" id="leaverow" hidden><button class="alt" onclick="leave()">Verlassen</button><button
+                        onclick="reset()" id="resetb">Neue Runde</button></div>
+                <div id="pool-box">
+                    <div id="pool-meta">Im Pool: <b id="cnt">0</b> · Tempo: <b id="spd">–</b></div>
+                    <div id="members"></div>
+                </div>
+            </div>
         </div>
-        <div id="go" hidden>JETZT GEMEINSAM LOSGEHEN!</div>
-        <div class="row" id="joinrow"><input id="name" maxlength="20" placeholder="Dein Name"><button
-                onclick="join()">Pool
-                beitreten</button></div>
-        <div class="row" id="leaverow" hidden><button class="alt" onclick="leave()">Verlassen</button><button
-                onclick="reset()" id="resetb">Neue Runde</button></div>
-        <p>Im Pool: <b id="cnt">0</b> · Tempo: <b id="spd">–</b></p>
-        <div id="members"></div>
-        <canvas id="cv2" width="140" height="1"
-            style="display:block;margin:8px auto;image-rendering:pixelated;width:100%;max-width:560px;background:#1b1b24"></canvas>
         <p><small id="mode"></small></p>
     </main>
     <footer
-        style="text-align:center;padding:16px 0 24px;opacity:.5;font-family:'Press Start 2P',monospace;font-size:9px;">
+        style="text-align:center;padding:10px 0 16px;opacity:.5;font-family:'Press Start 2P',monospace;font-size:8px;">
         Rauchen ist tödlich.
     </footer>
     <script>
@@ -236,17 +374,46 @@
         const $ = id => document.getElementById(id);
         const me = localStorage.rpId || (localStorage.rpId = Math.random().toString(36).slice(2, 10));
         $('name').value = localStorage.rpName || '';
-        let members = {}, offset = 0, ctx, wasDone = false, loaded = false;
-        let muted = localStorage.rpMuted === '1';
+        let members = {}, offset = 0, ctx = null, masterGain = null, wasDone = false, loaded = false;
+        let muted = false;
 
-        /* AudioContext bei erster Interaktion aufwecken (Browser-Policy) */
-        function initAudio() {
-            if (ctx) return;
-            ctx = new (window.AudioContext || window.webkitAudioContext)();
+        /* AudioContext fuer alle Geraete (Desktop, iOS Safari & Android) */
+        function getAudioCtx() {
+            if (!ctx) {
+                const AudioClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioClass) {
+                    ctx = new AudioClass();
+                    masterGain = ctx.createGain();
+                    masterGain.gain.value = muted ? 0 : 0.85;
+                    masterGain.connect(ctx.destination);
+                }
+            }
+            return ctx;
         }
-        document.addEventListener('click', initAudio, { once: true });
-        document.addEventListener('touchstart', initAudio, { once: true });
-        document.addEventListener('keydown', initAudio, { once: true });
+
+        function unlockAudio() {
+            const ac = getAudioCtx();
+            if (!ac) return;
+            if (ac.state === 'suspended') {
+                ac.resume().catch(() => {});
+            }
+            // Keepalive damit iOS / macOS Safari den AudioContext nach kurzen Pausen nicht wieder schlafen legt
+            if (!window.__audioKeepalive && ac.state === 'running') {
+                try {
+                    const osc = ac.createOscillator();
+                    const g = ac.createGain();
+                    g.gain.value = 0.00001;
+                    osc.connect(g);
+                    g.connect(ac.destination);
+                    osc.start();
+                    window.__audioKeepalive = true;
+                } catch (e) {}
+            }
+        }
+
+        ['touchstart', 'touchend', 'click', 'pointerdown', 'keydown'].forEach(ev => {
+            window.addEventListener(ev, unlockAudio, { passive: true });
+        });
         const now = () => Date.now() + offset;
 
         /* ---------- Speicher: Firebase REST oder lokaler Demo-Modus ---------- */
@@ -281,7 +448,42 @@
         setInterval(pull, 5000);
 
         /* ---------- Logik ---------- */
+        let demoRun = null;
+        function startDemo() {
+            muted = false;
+            localStorage.rpMuted = '0';
+            if (masterGain) masterGain.gain.value = 0.85;
+            $('mutebtn').textContent = 'TON: AN';
+            unlockAudio();
+            playStartBlip();
+            demoRun = {
+                startT: Date.now(),
+                totalDuration: 10,
+                totalCigs: 2
+            };
+            fallingCigs.length = 0;
+            looseCrumbs.length = 0;
+            lastCompleted = 0;
+            rollSeed = 17;
+            wasDone = false;
+            currentDoneCig = -1;
+            lastPlayedSoundP = -1;
+            loaded = true;
+            $('stage').classList.remove('is-done');
+            render();
+        }
+
         function calc() {
+            if (demoRun) {
+                const elapsed = Math.max(0, (Date.now() - demoRun.startT) / 1000);
+                const remain = Math.max(0, demoRun.totalDuration - elapsed);
+                return {
+                    n: demoRun.totalCigs,
+                    state: remain <= 0 ? 'done' : 'run',
+                    remain,
+                    speed: 1.0
+                };
+            }
             const ts = Object.values(members).filter(m => m && m.t && now() - m.t < EXPIRE).map(m => m.t).sort((a, b) => a - b);
             const n = ts.length; if (n < MIN) return { n, state: 'wait', remain: TOTAL };
             let p = 0; for (let k = MIN; k <= n; k++) { const s = ts[k - 1], e = k < n ? ts[k] : now(); p += Math.max(0, (e - s) / 1000) * (k / MIN) }
@@ -290,63 +492,251 @@
         function fmt(s) { s = Math.ceil(s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') }
         function inPool() { return members[me] }
         function join() {
+            demoRun = null;
             const nm = $('name').value.trim(); if (!nm) { $('name').focus(); $('name').style.borderColor = '#e8553d'; return }
-            localStorage.rpName = nm; unlock(); put(me, nm)
+            localStorage.rpName = nm;
+            unlockAudio();
+            playStartBlip();
+            put(me, nm);
         }
-        function leave() { del(me) }
-        function reset() { if (confirm('Pool für alle leeren und neue Runde starten?')) clearAll() }
+        function leave() { demoRun = null; del(me); }
+        function reset() {
+            if (demoRun) {
+                demoRun = null;
+                fallingCigs.length = 0;
+                looseCrumbs.length = 0;
+                lastCompleted = 0;
+                wasDone = false;
+                c.clearRect(0, 0, RW, RH);
+                render();
+                return;
+            }
+            if (confirm('Pool für alle leeren und neue Runde starten?')) clearAll();
+        }
         addEventListener('beforeunload', () => { if (!demo && inPool()) fetch(url('members/' + me), { method: 'DELETE', keepalive: true }) });
 
         /* ---------- Ton ---------- */
-        function unlock() { initAudio(); ctx.resume(); }
+        function unlock() { unlockAudio(); }
         function toggleMute() {
             muted = !muted;
             localStorage.rpMuted = muted ? '1' : '0';
-            $('mutebtn').textContent = muted ? 'UNMUTE' : 'MUTE';
+            $('mutebtn').textContent = muted ? 'TON: AUS' : 'TON: AN';
+            if (masterGain) {
+                masterGain.gain.value = muted ? 0 : 0.85;
+            }
+            if (!muted) {
+                unlockAudio();
+                playStartBlip();
+            }
         }
-        function jingle() {
-            if (!ctx || muted) return;
-            ctx.resume();
-            const delay = ctx.createDelay(0.5);
-            const feedback = ctx.createGain();
-            const delayGain = ctx.createGain();
-            delay.delayTime.value = 0.18;
-            feedback.gain.value = 0.35;
-            delayGain.gain.value = 0.4;
-            delay.connect(feedback);
-            feedback.connect(delay);
-            delay.connect(delayGain);
-            delayGain.connect(ctx.destination);
-            const notes = [523, 659, 784, 1047, 784, 1047];
-            notes.forEach((f, i) => {
-                const o = ctx.createOscillator(), g = ctx.createGain();
-                o.type = 'square'; o.frequency.value = f;
-                o.connect(g); g.connect(ctx.destination); g.connect(delay);
-                const t = ctx.currentTime + i * 0.2;
-                g.gain.setValueAtTime(0.13, t);
-                g.gain.exponentialRampToValueAtTime(0.001, t + 0.19);
-                o.start(t); o.stop(t + 0.2);
+
+        function playStartBlip() {
+            if (muted) return;
+            const ac = getAudioCtx();
+            if (!ac) return;
+            if (ac.state === 'suspended') ac.resume().catch(() => {});
+            try {
+                const t = ac.currentTime;
+                const o = ac.createOscillator(), g = ac.createGain();
+                o.type = 'square';
+                o.frequency.setValueAtTime(587, t);
+                o.frequency.setValueAtTime(880, t + 0.06);
+                g.gain.setValueAtTime(0.25, t);
+                g.gain.setValueAtTime(0.25, t + 0.06);
+                g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+                o.connect(g);
+                g.connect(masterGain || ac.destination);
+                o.start(t);
+                o.stop(t + 0.15);
+            } catch (e) {}
+        }
+
+        // Web Audio Synthesizer für Papier-Rollgeräusche (keine externen Dateien nötig)
+        let paperNoiseBuf = null;
+        function getPaperNoise() {
+            const ac = getAudioCtx();
+            if (!ac) return null;
+            if (paperNoiseBuf) return paperNoiseBuf;
+            try {
+                const len = Math.floor(ac.sampleRate * 1.5);
+                paperNoiseBuf = ac.createBuffer(1, len, ac.sampleRate);
+                const data = paperNoiseBuf.getChannelData(0);
+                for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+                return paperNoiseBuf;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function playPaperCrinkle(dur = 0.10, gain = 0.25, freq = 2400) {
+            if (muted) return;
+            const ac = getAudioCtx();
+            if (!ac) return;
+            if (ac.state === 'suspended') ac.resume().catch(() => {});
+            const noise = getPaperNoise();
+            if (!noise) return;
+            try {
+                const src = ac.createBufferSource();
+                src.buffer = noise;
+
+                const bp = ac.createBiquadFilter();
+                bp.type = 'bandpass';
+                bp.frequency.value = freq;
+                bp.Q.value = 1.8;
+
+                const g = ac.createGain();
+                const t = ac.currentTime;
+                g.gain.setValueAtTime(0.01, t);
+                g.gain.linearRampToValueAtTime(gain, t + dur * 0.2);
+                g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+                src.connect(bp);
+                bp.connect(g);
+                g.connect(masterGain || ac.destination);
+
+                src.start(t, Math.random() * 0.5, dur);
+            } catch (e) {}
+        }
+
+        function playPaperRollSweep(dur = 0.18, gain = 0.28) {
+            if (muted) return;
+            const ac = getAudioCtx();
+            if (!ac) return;
+            if (ac.state === 'suspended') ac.resume().catch(() => {});
+            const noise = getPaperNoise();
+            if (!noise) return;
+            try {
+                const src = ac.createBufferSource();
+                src.buffer = noise;
+
+                const bp = ac.createBiquadFilter();
+                bp.type = 'bandpass';
+                bp.frequency.setValueAtTime(1400, ac.currentTime);
+                bp.frequency.exponentialRampToValueAtTime(3200, ac.currentTime + dur);
+                bp.Q.value = 2.0;
+
+                const g = ac.createGain();
+                const t = ac.currentTime;
+                g.gain.setValueAtTime(0.01, t);
+                g.gain.linearRampToValueAtTime(gain, t + dur * 0.2);
+                g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+                src.connect(bp);
+                bp.connect(g);
+                g.connect(masterGain || ac.destination);
+
+                src.start(t, Math.random() * 0.5, dur);
+            } catch (e) {}
+        }
+
+        function playCigaretteLandSound() {
+            if (muted) return;
+            const ac = getAudioCtx();
+            if (!ac) return;
+            if (ac.state === 'suspended') ac.resume().catch(() => {});
+            try {
+                const t = ac.currentTime;
+                const o = ac.createOscillator(), g = ac.createGain();
+                o.type = 'triangle';
+                o.frequency.setValueAtTime(440, t);
+                o.frequency.exponentialRampToValueAtTime(140, t + 0.07);
+                g.gain.setValueAtTime(0.40, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+                o.connect(g);
+                g.connect(masterGain || ac.destination);
+                o.start(t);
+                o.stop(t + 0.08);
+            } catch (e) {}
+        }
+
+        const soundMilestones = [
+            { p: 0.04, fn: () => playPaperCrinkle(0.12, 0.26, 2200) }, // Blatt entfaltet
+            { p: 0.16, fn: () => playPaperCrinkle(0.08, 0.22, 3200) }, // Tabak rieselt
+            { p: 0.26, fn: () => playPaperCrinkle(0.08, 0.22, 3000) }, // Tabak rieselt
+            { p: 0.38, fn: () => playPaperRollSweep(0.18, 0.28) },     // Papier rollt ein
+            { p: 0.50, fn: () => playPaperRollSweep(0.18, 0.28) },     // Papier rollt ein
+            { p: 0.68, fn: () => playPaperCrinkle(0.09, 0.24, 2600) }, // Filter schiebt rein
+            { p: 0.82, fn: () => playPaperRollSweep(0.14, 0.26) }      // Klebenaht glattstreichen
+        ];
+        let lastPlayedSoundP = -1, currentDoneCig = -1;
+        function checkPaperSound(currentP, cigIdx) {
+            if (cigIdx !== currentDoneCig) {
+                currentDoneCig = cigIdx;
+                lastPlayedSoundP = -1;
+            }
+            soundMilestones.forEach(m => {
+                if (lastPlayedSoundP < m.p && currentP >= m.p) {
+                    m.fn();
+                }
             });
+            lastPlayedSoundP = currentP;
+        }
+
+        function jingle() {
+            if (muted) return;
+            const ac = getAudioCtx();
+            if (!ac) return;
+
+            const playNotes = () => {
+                try {
+                    const delay = ac.createDelay(0.5);
+                    const feedback = ac.createGain();
+                    const delayGain = ac.createGain();
+                    delay.delayTime.value = 0.18;
+                    feedback.gain.value = 0.35;
+                    delayGain.gain.value = 0.45;
+                    delay.connect(feedback);
+                    feedback.connect(delay);
+                    delay.connect(delayGain);
+                    delayGain.connect(masterGain || ac.destination);
+                    const notes = [523, 659, 784, 1047, 784, 1047];
+                    notes.forEach((f, i) => {
+                        const o = ac.createOscillator(), g = ac.createGain();
+                        o.type = 'square';
+                        o.frequency.value = f;
+                        o.connect(g);
+                        g.connect(masterGain || ac.destination);
+                        g.connect(delay);
+                        const t = ac.currentTime + i * 0.2;
+                        g.gain.setValueAtTime(0.35, t);
+                        g.gain.exponentialRampToValueAtTime(0.001, t + 0.19);
+                        o.start(t);
+                        o.stop(t + 0.2);
+                    });
+                } catch (e) {}
+            };
+
+            if (ac.state === 'suspended') {
+                ac.resume().then(playNotes).catch(playNotes);
+            } else {
+                playNotes();
+            }
         }
 
         /* ---------- Render ---------- */
         let S = { n: 0, state: 'wait', remain: TOTAL };
         function render() {
             S = calc(); const j = !!inPool();
-            $('joinrow').hidden = j; $('leaverow').hidden = !j; $('resetb').hidden = S.state !== 'done';
-            $('cnt').textContent = S.n; $('spd').textContent = S.state === 'run' ? S.speed.toFixed(1) + 'x' : '–';
-            $('members').innerHTML = Object.values(members).filter(m => m && m.name).map(m => `<span>${m.name.replace(/[<>&"]/g, '')}</span>`).join('');
-            $('status').textContent = S.state === 'wait' ? `Noch ${Math.max(0, MIN - S.n)} Person(en) fehlen …` : S.state === 'run' ? 'Countdown läuft!' : 'Zeit ist um!';
-            $('go').hidden = S.state !== 'done';
-            if (S.state === 'done' && !wasDone && loaded) { jingle(); setTimeout(jingle, 1500) }
-            wasDone = S.state === 'done';
+            const isDone = S.state === 'done';
+            $('stage').classList.toggle('is-done', isDone);
+            $('joinrow').hidden = j || !!demoRun;
+            $('leaverow').hidden = !j && !demoRun;
+            $('resetb').hidden = !isDone && !demoRun;
+            $('cnt').textContent = S.n;
+            $('spd').textContent = S.state === 'run' ? S.speed.toFixed(1) + 'x' : '–';
+            const mList = demoRun ? [{ name: 'Demo 1' }, { name: 'Demo 2' }] : Object.values(members);
+            $('members').innerHTML = mList.filter(m => m && m.name).map(m => `<span>${m.name.replace(/[<>&"]/g, '')}</span>`).join('');
+            $('status').textContent = S.state === 'wait' ? `Noch ${Math.max(0, MIN - S.n)} Person(en) fehlen …` : S.state === 'run' ? (demoRun ? 'Demo-Countdown läuft!' : 'Countdown läuft!') : 'Zeit ist um!';
+            $('go').hidden = !isDone;
+            if (isDone && !wasDone && loaded) { jingle(); setTimeout(jingle, 1500); }
+            wasDone = isDone;
         }
         /* ---------- Animation ---------- */
         const cv = $('cv'), c = cv.getContext('2d');
         const cv2 = $('cv2'), c2 = cv2.getContext('2d');
         let prevT = 0, lastCompleted = 0, rollSeed = 17;
         const fallingCigs = [];
-        $('mutebtn').textContent = muted ? 'UNMUTE' : 'MUTE';
+        $('mutebtn').textContent = muted ? 'TON: AUS' : 'TON: AN';
 
         // Geometrie Zigarette (Canvas-Pixel, 4× CSS-Skalierung)
         const RW = 140, RH = 64;
@@ -431,6 +821,12 @@
         // Wie viele Zigaretten sind fertig gedreht?
         // Letzte Zigarette fertig bei remain=0.
         function completedCount(n, remain) {
+            if (demoRun) {
+                if (S.state === 'done') return demoRun.totalCigs;
+                const cigDur = demoRun.totalDuration / demoRun.totalCigs;
+                const elapsed = demoRun.totalDuration - remain;
+                return Math.min(demoRun.totalCigs, Math.max(0, Math.floor(elapsed / cigDur)));
+            }
             if (S.state === 'done') return n;
             if (S.state !== 'run' || n < MIN) return 0;
             return Math.max(0, n - Math.ceil(remain * n / TOTAL));
@@ -576,7 +972,7 @@
             const cols = ['#6b3a18', '#7a4a20', '#8a5228', '#9a6030', '#5a2d10'];
             for (let i = 0; i < count; i++) {
                 looseCrumbs.push({
-                    x: x + (Math.random() - 0.5) * 3,
+                    x: x + (Math.random() - 0.5) * 4,
                     y: y + (Math.random() - 0.5) * 2,
                     vx: (Math.random() - 0.5) * 22,
                     vy: -Math.random() * 16 - 3,
@@ -585,246 +981,118 @@
             }
         }
 
-        // 2D Starrkörper-Physik für fallende und kollidierende Zigaretten
-        function getCorners(cig) {
-            const cos = Math.cos(cig.angle), sin = Math.sin(cig.angle);
-            const hl = CTW / 2; // 55
-            const hh = CTH / 2; // 6
-            return [
-                { x: hl * cos - hh * sin, y: hl * sin + hh * cos },
-                { x: -hl * cos - hh * sin, y: -hl * sin + hh * cos },
-                { x: -hl * cos + hh * sin, y: -hl * sin - hh * cos },
-                { x: hl * cos + hh * sin, y: hl * sin - hh * cos }
-            ];
-        }
-
-        function solveCigCollision(A, B) {
-            const dx = B.x - A.x, dy = B.y - A.y;
-            const hl = CTW / 2, hh = CTH / 2;
-            const rBound = Math.hypot(hl, hh);
-            if (dx * dx + dy * dy > (rBound * 2) * (rBound * 2)) return;
-
-            const cosA = Math.cos(A.angle), sinA = Math.sin(A.angle);
-            const cosB = Math.cos(B.angle), sinB = Math.sin(B.angle);
-
-            // 4 Trennachsen nach SAT (Separating Axis Theorem)
-            const axes = [
-                { x: cosA, y: sinA },
-                { x: -sinA, y: cosA },
-                { x: cosB, y: sinB },
-                { x: -sinB, y: cosB }
-            ];
-
-            let minOverlap = Infinity;
-            let bestAxis = null;
-
-            for (let i = 0; i < 4; i++) {
-                const ax = axes[i].x, ay = axes[i].y;
-                const rA = hl * Math.abs(cosA * ax + sinA * ay) + hh * Math.abs(-sinA * ax + cosA * ay);
-                const rB = hl * Math.abs(cosB * ax + sinB * ay) + hh * Math.abs(-sinB * ax + cosB * ay);
-                const dist = Math.abs(dx * ax + dy * ay);
-                const overlap = (rA + rB) - dist;
-                if (overlap <= 0) return; // Trennachse gefunden -> keine Kollision
-                if (overlap < minOverlap) {
-                    minOverlap = overlap;
-                    bestAxis = { x: ax, y: ay };
-                }
-            }
-
-            // Normale so ausrichten, dass sie von B nach A zeigt
-            let nx = bestAxis.x, ny = bestAxis.y;
-            if ((A.x - B.x) * nx + (A.y - B.y) * ny < 0) {
-                nx = -nx; ny = -ny;
-            }
-
-            // Kontaktpunkt bestimmen (tiefst eindringende Ecke)
-            const cornersA = getCorners(A);
-            const cornersB = getCorners(B);
-            let deepestPen = -Infinity;
-            let contactX = (A.x + B.x) / 2, contactY = (A.y + B.y) / 2;
-
-            cornersA.forEach(c => {
-                const wx = A.x + c.x, wy = A.y + c.y;
-                const pen = -((wx - B.x) * nx + (wy - B.y) * ny);
-                if (pen > deepestPen) { deepestPen = pen; contactX = wx; contactY = wy; }
-            });
-            cornersB.forEach(c => {
-                const wx = B.x + c.x, wy = B.y + c.y;
-                const pen = (wx - A.x) * nx + (wy - A.y) * ny;
-                if (pen > deepestPen) { deepestPen = pen; contactX = wx; contactY = wy; }
-            });
-
-            // Hebelarme zum Kontaktpunkt
-            const rax = contactX - A.x, ray = contactY - A.y;
-            const rbx = contactX - B.x, rby = contactY - B.y;
-
-            // Relativgeschwindigkeit am Kontaktpunkt
-            const vAx = A.vx - A.omega * ray, vAy = A.vy + A.omega * rax;
-            const vBx = B.vx - B.omega * rby, vBy = B.vy + B.omega * rbx;
-            const vRelX = vAx - vBx, vRelY = vAy - vBy;
-            const vn = vRelX * nx + vRelY * ny;
-
-            if (vn < 0) {
-                const mA = 1.0, mB = 1.0;
-                const IA = 420, IB = 420;
-                const e = 0.25;
-
-                const crossA = rax * ny - ray * nx;
-                const crossB = rbx * ny - rby * nx;
-                const denomN = (1 / mA + 1 / mB) + (crossA * crossA) / IA + (crossB * crossB) / IB;
-                const jn = -(1 + e) * vn / denomN;
-
-                A.vx += (jn * nx) / mA;
-                A.vy += (jn * ny) / mA;
-                A.omega += (crossA * jn) / IA;
-
-                B.vx -= (jn * nx) / mB;
-                B.vy -= (jn * ny) / mB;
-                B.omega -= (crossB * jn) / IB;
-
-                // Reibung / Tangentialimpuls
-                const tx = -ny, ty = nx;
-                const vt = vRelX * tx + vRelY * ty;
-                const crossAt = rax * ty - ray * tx;
-                const crossBt = rbx * ty - rby * tx;
-                const denomT = (1 / mA + 1 / mB) + (crossAt * crossAt) / IA + (crossBt * crossBt) / IB;
-                let jt = -vt / denomT;
-                const maxFriction = 0.45 * jn;
-                jt = Math.max(-maxFriction, Math.min(maxFriction, jt));
-
-                A.vx += (jt * tx) / mA;
-                A.vy += (jt * ty) / mA;
-                A.omega += (crossAt * jt) / IA;
-
-                B.vx -= (jt * tx) / mB;
-                B.vy -= (jt * ty) / mB;
-                B.omega -= (crossBt * jt) / IB;
-
-                if (Math.abs(vn) > 10) spawnImpactCrumbs(contactX, contactY, 2);
-            }
-
-            // Positionskorrektur (Vermeidet Durchdringen)
-            const corr = minOverlap * 0.52;
-            A.x += nx * corr; A.y += ny * corr;
-            B.x -= nx * corr; B.y -= ny * corr;
-            A.settled = false; B.settled = false;
-        }
-
+        // Stabile, wackelfreie Physik: Zigaretten fallen hinter den Text, landen auf unsichtbarer Fläche oder fallen daneben
         function updateAndDrawStack(dt) {
-            const N = fallingCigs.length;
-            if (N === 0) {
-                if (cv2.height !== 0) cv2.height = 0;
-                cv2.style.display = 'none';
-                return;
+            const stageEl = $('stage');
+            const stageW = stageEl ? stageEl.clientWidth : 560;
+            const stageH = stageEl ? stageEl.clientHeight : 260;
+            const dpr = window.devicePixelRatio || 1;
+
+            const bufW = Math.round(stageW * dpr);
+            const bufH = Math.round(stageH * dpr);
+            if (cv2.width !== bufW || cv2.height !== bufH) {
+                cv2.width = bufW;
+                cv2.height = bufH;
             }
-            cv2.style.display = 'block';
-            const targetH = Math.min(140, Math.max(88, 80 + Math.max(0, N - 2) * 8));
-            if (cv2.height !== targetH) cv2.height = targetH;
-            c2.clearRect(0, 0, cv2.width, cv2.height);
 
-            const floorY = cv2.height - 4;
-            // Boden-Linie / Aschefläche
-            c2.fillStyle = '#22222d';
-            c2.fillRect(0, floorY + 2, cv2.width, cv2.height - floorY);
-            c2.fillStyle = '#2e2e3d';
-            c2.fillRect(0, floorY + 1, cv2.width, 1);
+            if (c2.resetTransform) c2.resetTransform();
+            else c2.setTransform(1, 0, 0, 1, 0, 0);
 
-            const gravity = 180;
-            const subSteps = 4;
-            const sdt = dt / subSteps;
-            const hl = CTW / 2, hh = CTH / 2;
-            const mass = 1.0, inertia = 420;
+            c2.clearRect(0, 0, bufW, bufH);
 
-            for (let step = 0; step < subSteps; step++) {
-                fallingCigs.forEach(fc => {
-                    if (fc.settled) return;
+            const pixelScale = (stageW / 140) * dpr;
+            c2.scale(pixelScale, pixelScale);
 
-                    // Schwerkraft & Dämpfung
-                    fc.vy += gravity * sdt;
-                    fc.vx *= Math.pow(0.985, sdt * 60);
-                    fc.vy *= Math.pow(0.995, sdt * 60);
-                    fc.omega *= Math.pow(0.96, sdt * 60);
+            // Virtuelle Koordinatenhöhe (gleiches 140er-Raster wie cv)
+            const vHeight = stageH / (stageW / 140);
+            const floorY = vHeight - 6;
+            const tableX1 = 18;
+            const tableX2 = 122;
 
-                    fc.x += fc.vx * sdt;
-                    fc.y += fc.vy * sdt;
-                    fc.angle += fc.omega * sdt;
+            // Die Ablagefläche ist komplett unsichtbar (kein c2.fillRect für den Tisch/Boden)
 
-                    const corners = getCorners(fc);
+            const gravity = 140;
+            const halfH = CTH / 2; // 6
 
-                    // Boden-Kollision für alle 4 Ecken
-                    let onFloor = false;
-                    corners.forEach(c => {
-                        const wy = fc.y + c.y;
-                        if (wy > floorY) {
-                            onFloor = true;
-                            const pen = wy - floorY;
-                            const pvx = fc.vx - fc.omega * c.y;
-                            const pvy = fc.vy + fc.omega * c.x;
+            fallingCigs.forEach((fc, idx) => {
+                if (fc.settled) return;
 
-                            if (pvy > 0) {
-                                const denom = (1 / mass) + (c.x * c.x) / inertia;
-                                const jn = -(1 + 0.28) * pvy / denom;
-                                fc.vy += jn / mass;
-                                fc.omega += (c.x * jn) / inertia;
+                // Natürliche Fallbewegung & sanfte Luftreibung
+                fc.vy += gravity * dt;
+                fc.vx *= Math.pow(0.985, dt * 60);
+                fc.omega *= Math.pow(0.965, dt * 60);
 
-                                // Bodenreibung
-                                const denomT = (1 / mass) + (c.y * c.y) / inertia;
-                                let jt = -pvx / denomT;
-                                const maxMu = 0.5 * Math.abs(jn);
-                                jt = Math.max(-maxMu, Math.min(maxMu, jt));
-                                fc.vx += jt / mass;
-                                fc.omega -= (c.y * jt) / inertia;
+                fc.x += fc.vx * dt;
+                fc.y += fc.vy * dt;
+                fc.angle += fc.omega * dt;
 
-                                if (pvy > 12) spawnImpactCrumbs(fc.x + c.x, floorY, 2);
-                            }
-                            fc.y -= pen * 0.75;
-                            fc.angle -= (c.x * pen / (hl * hl)) * 0.45;
-                        }
-                    });
+                // Aus dem Sichtbereich gefallen
+                if (fc.y > vHeight + 35) {
+                    fc.fellOff = true;
+                    return;
+                }
 
-                    // Wand-Kollision (x = 2 und x = 138)
-                    corners.forEach(c => {
-                        const wx = fc.x + c.x;
-                        if (wx < 2) {
-                            const pen = 2 - wx;
-                            const pvx = fc.vx - fc.omega * c.y;
-                            if (pvx < 0) {
-                                const jn = -(1 + 0.3) * pvx / (1 / mass + (c.y * c.y) / inertia);
-                                fc.vx += jn / mass;
-                                fc.omega -= (c.y * jn) / inertia;
-                            }
-                            fc.x += pen;
-                        } else if (wx > 138) {
-                            const pen = wx - 138;
-                            const pvx = fc.vx - fc.omega * c.y;
-                            if (pvx > 0) {
-                                const jn = -(1 + 0.3) * pvx / (1 / mass + (c.y * c.y) / inertia);
-                                fc.vx += jn / mass;
-                                fc.omega -= (c.y * jn) / inertia;
-                            }
-                            fc.x -= pen;
-                        }
-                    });
+                // Prüfen ob Zigarette über der Ablagefläche ist
+                const isOverTable = (fc.x >= tableX1 - 8 && fc.x <= tableX2 + 8);
 
-                    // Ruhe-Zustand prüfen
-                    if (onFloor && Math.abs(fc.vx) < 0.25 && Math.abs(fc.vy) < 0.3 && Math.abs(fc.omega) < 0.06) {
-                        fc.sleepTimer = (fc.sleepTimer || 0) + 1;
-                        if (fc.sleepTimer > 35) {
-                            fc.settled = true;
-                            fc.vx = 0; fc.vy = 0; fc.omega = 0;
-                        }
-                    } else {
-                        fc.sleepTimer = 0;
+                if (!isOverTable) {
+                    // Fällt daneben: Kippt natürlich über die Kante ab und stürzt ab
+                    if (fc.y > floorY - 18) {
+                        fc.omega += (fc.x < tableX1 ? -1.0 : 1.0) * dt * 4;
                     }
-                });
+                    return;
+                }
 
-                // Zigarette-an-Zigarette Kollisionen prüfen
-                for (let i = 0; i < N; i++) {
-                    for (let j = i + 1; j < N; j++) {
-                        solveCigCollision(fallingCigs[i], fallingCigs[j]);
+                // Bestimme Auflagehöhe (auf Boden oder auf bereits liegenden Zigaretten)
+                let targetSurfaceY = floorY - halfH;
+
+                for (let j = 0; j < idx; j++) {
+                    const other = fallingCigs[j];
+                    if (!other.settled || other.fellOff) continue;
+
+                    const dx = Math.abs(fc.x - other.x);
+                    if (dx < 70) {
+                        const stackY = other.y - CTH + 1;
+                        if (stackY < targetSurfaceY) {
+                            targetSurfaceY = stackY;
+                        }
                     }
                 }
-            }
+
+                // Aufprall / Auflage
+                if (fc.y >= targetSurfaceY) {
+                    fc.y = targetSurfaceY;
+
+                    if (fc.vy > 0) {
+                        if (fc.vy > 12) spawnImpactCrumbs(fc.x - 30 + Math.random() * 60, targetSurfaceY + halfH, 2);
+                        playCigaretteLandSound();
+                        fc.vy = -fc.vy * 0.10; // Sanfter Puffer
+                    }
+                    fc.vx *= 0.40;
+                    fc.omega *= 0.20;
+                    fc.angle *= 0.50;
+
+                    // Wenn nah am Rand, rutscht sie seitlich ab
+                    if (fc.x < tableX1 + 12) {
+                        fc.vx -= 10;
+                        fc.omega -= 0.7;
+                    } else if (fc.x > tableX2 - 12) {
+                        fc.vx += 10;
+                        fc.omega += 0.7;
+                    }
+
+                    // Stabiler Ruhezustand: Liegt exakt horizontal (angle = 0) und integer-eingerastet gegen jeden Pixelblur!
+                    if (Math.abs(fc.vy) < 3.5 && Math.abs(fc.vx) < 1.8 && Math.abs(fc.omega) < 0.15) {
+                        fc.settled = true;
+                        fc.vx = 0;
+                        fc.vy = 0;
+                        fc.omega = 0;
+                        fc.angle = 0; // Exakt flach ausgerichtet!
+                        fc.x = Math.round(fc.x);
+                        fc.y = Math.round(fc.y);
+                    }
+                }
+            });
 
             // Tabakbrösel / Asche aktualisieren und zeichnen
             for (let i = looseCrumbs.length - 1; i >= 0; i--) {
@@ -832,18 +1100,25 @@
                 cr.vy += 120 * dt;
                 cr.x += cr.vx * dt;
                 cr.y += cr.vy * dt;
-                if (cr.y >= floorY) {
+                if (cr.x >= tableX1 && cr.x <= tableX2 && cr.y >= floorY) {
                     cr.y = floorY;
-                    cr.vy = -cr.vy * 0.25;
-                    cr.vx *= 0.7;
+                    cr.vy = -cr.vy * 0.2;
+                    cr.vx *= 0.6;
+                }
+                if (cr.y > vHeight + 20) {
+                    looseCrumbs.splice(i, 1);
+                    continue;
                 }
                 c2.fillStyle = cr.col;
                 c2.fillRect(Math.round(cr.x), Math.round(cr.y), 1, 1);
             }
 
-            // Alle Zigaretten mit voller Dicke & identischem Look zeichnen
+            // Alle aktiven Zigaretten zeichnen (bei settled: integer coordinates & angle=0 für gestochen scharfen Retro-Look)
             fallingCigs.forEach(fc => {
-                drawCigarette(c2, Math.round(fc.x), Math.round(fc.y), fc.angle);
+                if (fc.fellOff) return;
+                const drawX = fc.settled ? Math.round(fc.x) : fc.x;
+                const drawY = fc.settled ? Math.round(fc.y) : fc.y;
+                drawCigarette(c2, drawX, drawY, fc.angle);
             });
         }
 
@@ -851,6 +1126,9 @@
             const dt = prevT ? Math.min((ts - prevT) / 1000, 0.05) : 0;
             prevT = ts;
             S = calc();
+            if (S.state === 'done' && !wasDone) {
+                render();
+            }
             $('time').textContent = fmt(S.state === 'wait' ? TOTAL : S.remain);
             $('clock').textContent = new Date(now()).toLocaleTimeString('de-DE');
 
@@ -861,16 +1139,20 @@
 
             const n = S.n, remain = S.remain;
 
-            // Rolling-Animation
+            // Rolling-Animation mit dezenten Papier-Rollgeräuschen
             if (S.state === 'wait') {
-                // Langsamer Idle-Loop
-                drawRolling((Date.now() / 14000) % 0.93, rollSeed);
+                // Langsamer Idle-Loop mit feinem Papierrascheln
+                const idleP = (Date.now() / 14000) % 0.93;
+                checkPaperSound(idleP, -99);
+                drawRolling(idleP, rollSeed);
             } else if (S.state === 'run') {
                 const done = completedCount(n, remain);
                 if (done < n) {
-                    const startR = TOTAL * (n - done) / n;
-                    const endR = TOTAL * (n - done - 1) / n;
+                    const totalDur = demoRun ? demoRun.totalDuration : TOTAL;
+                    const startR = totalDur * (n - done) / n;
+                    const endR = totalDur * (n - done - 1) / n;
                     const phase = Math.max(0, Math.min(1, (startR - remain) / (startR - endR)));
+                    checkPaperSound(phase, done);
                     drawRolling(phase, rollSeed);
                 } else {
                     c.clearRect(0, 0, RW, RH);
@@ -879,19 +1161,19 @@
                 c.clearRect(0, 0, RW, RH);
             }
 
-            // Fertige Zigaretten in Fallanimation mit Physik starten
+            // Fertige Zigaretten starten Fallanimation in cv2 hinter dem Text
             const nowDone = completedCount(n, remain);
             while (lastCompleted < nowDone && lastCompleted < n) {
-                const spawnX = CX0 + CTW / 2 + (Math.random() - 0.5) * 12;
+                const spawnX = CX0 + CTW / 2 + (Math.random() - 0.5) * 14;
                 fallingCigs.push({
                     x: spawnX,
-                    y: -12,
-                    vx: (Math.random() - 0.5) * 14,
-                    vy: 24 + Math.random() * 12,
-                    angle: (Math.random() - 0.5) * 0.16,
-                    omega: (Math.random() - 0.5) * 1.0,
+                    y: -6, // Nahtloser Übergang direkt am oberen Rand von cv2
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: 105 + Math.random() * 15,
+                    angle: 0.10 + (Math.random() - 0.5) * 0.04,
+                    omega: (Math.random() - 0.5) * 0.4,
                     settled: false,
-                    sleepTimer: 0
+                    fellOff: false
                 });
                 rollSeed = (rollSeed * 37 + 13) % 100;
                 lastCompleted++;
@@ -904,6 +1186,34 @@
 
         /* ---------- Pop-ups ---------- */
         const POPUPS = [
+            {
+                title: 'LEST_FAKD.exe',
+                text: 'Lest die FAKD. Unabhängiges Magazin für Kunst und Text.',
+                btn: 'Jetzt online lesen',
+                url: 'https://thefakd.com/#start',
+                alt: true
+            },
+            {
+                title: 'MERCH.ini',
+                text: 'Bald gibt es wieder FAKD-Merch. Neue Teile sind in Arbeit.',
+                btn: 'Updates auf Insta',
+                url: 'https://www.instagram.com/the.fakd/',
+                alt: false
+            },
+            {
+                title: 'MERCH_DROP.sys',
+                text: 'Shirts, Beutel und Prints in Vorbereitung. Bald verfügbar.',
+                btn: '@the.fakd folgen',
+                url: 'https://www.instagram.com/the.fakd/',
+                alt: false
+            },
+            {
+                title: 'FAKD_TXT.bat',
+                text: 'Lest die FAKD: Gedruckt auf echtem Papier oder digital.',
+                btn: 'thefakd.com aufrufen',
+                url: 'https://thefakd.com/#start',
+                alt: true
+            },
             {
                 title: 'INSTA.exe',
                 text: 'Schon den Flurfunk auf Instagram gecheckt?',
@@ -919,11 +1229,25 @@
                 alt: true
             },
             {
+                title: 'KIPPE.log',
+                text: 'Rauchpause vorbei? Lest die FAKD in Ruhe weiter.',
+                btn: 'Magazin durchstöbern',
+                url: 'https://thefakd.com/#start',
+                alt: true
+            },
+            {
                 title: 'DROP_ALERT.dll',
                 text: 'Neuste Ausgabe, Drops & Stories:',
                 btn: 'Folge @the.fakd auf Insta',
                 url: 'https://www.instagram.com/the.fakd/',
                 alt: false
+            },
+            {
+                title: 'SUPPORT.exe',
+                text: 'Lest die FAKD und supportet das Magazin beim nächsten Drop.',
+                btn: 'Mehr auf thefakd.com',
+                url: 'https://thefakd.com/#start',
+                alt: true
             },
             {
                 title: 'SUBMIT.bat',
@@ -974,32 +1298,63 @@
             const bar = el.querySelector('.bar');
             bar.style.cursor = 'grab';
             let sx, sy, sl, st;
-            bar.addEventListener('mousedown', e => {
-                e.preventDefault();
-                sx = e.clientX; sy = e.clientY;
+
+            function startDrag(clientX, clientY) {
+                sx = clientX; sy = clientY;
                 sl = parseInt(el.style.left) || 0;
                 st = parseInt(el.style.top) || 0;
                 bar.style.cursor = 'grabbing';
                 el.style.zIndex = 99;
-                function onMove(e) {
-                    el.style.left = (sl + e.clientX - sx) + 'px';
-                    el.style.top = (st + e.clientY - sy) + 'px';
-                }
+            }
+
+            function doDrag(clientX, clientY) {
+                el.style.left = (sl + clientX - sx) + 'px';
+                el.style.top = (st + clientY - sy) + 'px';
+            }
+
+            function stopDrag() {
+                bar.style.cursor = 'grab';
+                el.style.zIndex = 50;
+            }
+
+            bar.addEventListener('mousedown', e => {
+                e.preventDefault();
+                startDrag(e.clientX, e.clientY);
+                function onMove(e) { doDrag(e.clientX, e.clientY); }
                 function onUp() {
-                    bar.style.cursor = 'grab';
-                    el.style.zIndex = 50;
+                    stopDrag();
                     document.removeEventListener('mousemove', onMove);
                     document.removeEventListener('mouseup', onUp);
                 }
                 document.addEventListener('mousemove', onMove);
                 document.addEventListener('mouseup', onUp);
             });
+
+            bar.addEventListener('touchstart', e => {
+                const touch = e.touches[0];
+                if (!touch) return;
+                startDrag(touch.clientX, touch.clientY);
+                function onTouchMove(e) {
+                    const t = e.touches[0];
+                    if (!t) return;
+                    doDrag(t.clientX, t.clientY);
+                }
+                function onTouchEnd() {
+                    stopDrag();
+                    document.removeEventListener('touchmove', onTouchMove);
+                    document.removeEventListener('touchend', onTouchEnd);
+                }
+                document.addEventListener('touchmove', onTouchMove, { passive: true });
+                document.addEventListener('touchend', onTouchEnd, { passive: true });
+            }, { passive: true });
         }
         function popup() {
             if (document.hidden) return;
             const d = document.createElement('div'); d.className = 'pop';
-            d.style.left = Math.random() * Math.max(10, innerWidth - 320) + 'px';
-            d.style.top = (60 + Math.random() * Math.max(10, innerHeight - 220)) + 'px';
+            const maxW = Math.max(10, innerWidth - 320);
+            d.style.left = Math.max(10, Math.floor(Math.random() * maxW)) + 'px';
+            const maxH = Math.max(70, innerHeight - 240);
+            d.style.top = Math.max(60, Math.floor(60 + Math.random() * (maxH - 60))) + 'px';
             const item = POPUPS[Math.floor(Math.random() * POPUPS.length)];
             const i = Math.floor(Math.random() * 3);
             d.innerHTML = `<div class="bar"><span>${item.title}</span><b>X</b></div><div class="body"><span class="spr-slot"></span><div class="pop-content"><div>${item.text}</div><a class="pop-link ${item.alt ? 'alt' : ''}" href="${item.url}" target="_blank" rel="noopener noreferrer">${item.btn}</a></div></div>`;
